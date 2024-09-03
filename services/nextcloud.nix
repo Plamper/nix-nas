@@ -3,10 +3,10 @@
   containers.nextcloud = {
     autoStart = true;
     privateNetwork = true;
-    forwardPorts = [{
-      hostPort = 80;
-      containerPort = 8080;
-    }];
+    # forwardPorts = [{
+    #   hostPort = 80;
+    #   containerPort = 8080;
+    # }];
     hostAddress = "192.168.100.10";
     localAddress = "192.168.100.11";
     # hostAddress6 = "fc00::1";
@@ -16,7 +16,8 @@
       services.nextcloud = {
         enable = true;
         package = pkgs.nextcloud29;
-        hostName = "localhost";
+        hostName = "test-nextcloud.bodenlos-schlem.men";
+        https = true;
         config.adminpassFile = "${pkgs.writeText "adminpass" "test123"}"; # DON'T DO THIS IN PRODUCTION - the password file will be world-readable in the Nix Store!
       };
 

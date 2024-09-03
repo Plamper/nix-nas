@@ -3,16 +3,19 @@
   containers.jellyfin = {
     autoStart = true;
     privateNetwork = true;
-    forwardPorts = [{
-      hostPort = 8096;
-    }];
+    # forwardPorts = [{
+    #   hostPort = 8096;
+    # }];
     hostAddress = "192.168.100.12";
     localAddress = "192.168.100.13";
     # hostAddress6 = "fc00::1";
     # localAddress6 = "fc00::2";
     config = { config, pkgs, lib, ... }: {
 
-      services.jellyfin.enable = true;
+      services.jellyfin = {
+        enable = true;
+        openFirewall = true;
+      };
       environment.systemPackages = [
         pkgs.jellyfin
         pkgs.jellyfin-web
@@ -25,7 +28,7 @@
       networking = {
         firewall = {
           enable = true;
-          allowedTCPPorts = [ 80 ];
+          # allowedTCPPorts = [ 8096 ];
         };
         # Use systemd-resolved inside the container
         # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686

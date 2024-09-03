@@ -25,7 +25,7 @@
       "test-nextcloud.bodenlos-schlem.men" = {
         # enableACME = true;
         # acmeRoot = null;
-        forceSSL = true;
+        # forceSSL = true;
         locations."/" = {
 
           proxyPass = "http://192.168.100.11";
@@ -41,7 +41,7 @@
       "test-jellyfin.bodenlos-schlem.men" = {
         # enableACME = true;
         # acmeRoot = null;
-        forceSSL = true;
+        # forceSSL = true;
         locations."/" = {
 
           proxyPass = "http://192.168.100.13:8020";

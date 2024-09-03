@@ -5,6 +5,7 @@
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
     agenix.url = "github:ryantm/agenix";
+    vscode-server.url = "github:nix-community/nixos-vscode-server";
   };
 
   outputs =

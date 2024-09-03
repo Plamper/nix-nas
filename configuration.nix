@@ -9,7 +9,7 @@
   imports = [
     (modulesPath + "/virtualisation/virtualbox-image.nix")
     # ./hardware-configuration.nix
-
+    inputs.vscode-server.nixosModules.default
     # Services
     ./services/openssh.nix
     ./services/nextcloud.nix
@@ -76,6 +76,8 @@
       extraGroups = [ "wheel" ];
     };
   };
+
+  services.vscode-server.enable = true;
 
   virtualisation.vmVariant = {
     # following configuration is added only when building VM with build-vm

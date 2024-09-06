@@ -9,12 +9,13 @@
   imports = [
     (modulesPath + "/virtualisation/virtualbox-image.nix")
     # ./hardware-configuration.nix
-    inputs.vscode-server.nixosModules.default
+
     # Services
     ./services/openssh.nix
     ./services/nextcloud.nix
     ./services/jellyfin.nix
-    # ./services/arr.nix
+    ./services/arr.nix
+    ./services/monitoring.nix
     ./secrets
     ./services/reverse-proxy.nix
   ];
@@ -77,7 +78,7 @@
     };
   };
 
-  services.vscode-server.enable = true;
+  programs.nix-ld.enable = true;
 
   virtualisation.vmVariant = {
     # following configuration is added only when building VM with build-vm
@@ -91,8 +92,11 @@
   networking = {
     # For vm Testing
     usePredictableInterfaceNames = false;
-    networkmanager.enable = true;
-    
+
+    firewall.enable = true;
+
+    nameservers = [ "1.1.1.1" "8.8.8.8" "9.9.9.9" ];
+
     nat = {
       enable = true;
       internalInterfaces = [ "ve-+" ];
@@ -103,7 +107,13 @@
 
   services.tailscale.enable = true;
 
-  environment.systemPackages = [ inputs.agenix.packages.x86_64-linux.default ];
+  environment.systemPackages = (with pkgs;[
+    git
+    nixd
+    nixpkgs-fmt
+  ]) ++ [
+    inputs.agenix.packages.x86_64-linux.default
+  ];
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";

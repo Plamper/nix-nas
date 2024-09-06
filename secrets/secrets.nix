@@ -7,4 +7,5 @@ in
 {
   "vpn.env.age".publicKeys = keys;
   "cloudflare-token.age".publicKeys = keys;
+  "nextcloud.age".publicKeys = keys;
 }

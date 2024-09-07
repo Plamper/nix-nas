@@ -9,14 +9,15 @@
   imports = [
     (modulesPath + "/virtualisation/virtualbox-image.nix")
     # ./hardware-configuration.nix
+    ./secrets
 
     # Services
     ./services/openssh.nix
-    ./services/nextcloud.nix
+    # ./services/nextcloud.nix
     ./services/jellyfin.nix
     ./services/arr.nix
     ./services/monitoring.nix
-    ./secrets
+    ./services/podman-containers.nix
     ./services/reverse-proxy.nix
   ];
 

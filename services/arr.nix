@@ -7,7 +7,6 @@
     agenix.nixosModules.default
   ];
 
-
   services.pia-wg = {
     enable = true;
     username = "p8566938";
@@ -28,7 +27,8 @@
   services.transmission = {
     enable = true;
     package = pkgs.transmission_4;
-    settings = { #Override default settings
+    settings = {
+      #Override default settings
       rpc-bind-address = "0.0.0.0"; #Bind to own IP
       rpc-whitelist = "127.0.0.1,192.168.1.*"; #Whitelist your remote machine (10.0.0.1 in this example)
     };
@@ -38,5 +38,11 @@
   services.sonarr = {
     enable = true;
     openFirewall = true;
+  };
+
+  # needs to be configured when finally deployed 
+  services.prometheus.exporters.exportarr-sonarr = {
+    enable = false;
+    port = 9003;
   };
 }

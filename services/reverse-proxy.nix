@@ -23,6 +23,12 @@
     recommendedTlsSettings = true;
 
     virtualHosts = {
+      "bodenlos-schlem.men" = {
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:7575";
+        };
+      };
+
       "test-nextcloud.bodenlos-schlem.men" = {
         # enableACME = true;
         # acmeRoot = null;
@@ -83,12 +89,12 @@
       };
 
       # Grafana Virtual Host
-      ${config.services.grafana.domain} = {
+      ${config.services.grafana.settings.server.domain} = {
         # enableACME = true;
         # acmeRoot = null;
         # forceSSL = true;
         locations."/" = {
-          proxyPass = "http://127.0.0.1:${toString config.services.grafana.port}";
+          proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
           proxyWebsockets = true;
         };
       };

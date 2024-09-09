@@ -7,9 +7,11 @@
 }: {
 
   imports = [
-    (modulesPath + "/virtualisation/virtualbox-image.nix")
-    # ./hardware-configuration.nix
+    # (modulesPath + "/virtualisation/virtualbox-image.nix")
+    ./hardware-configuration.nix
     ./secrets
+
+    ./services/zfs.nix
 
     # Services
     ./services/openssh.nix
@@ -17,7 +19,7 @@
     ./services/jellyfin.nix
     ./services/arr.nix
     ./services/monitoring.nix
-    ./services/podman-containers.nix
+    # ./services/podman-containers.nix
     ./services/reverse-proxy.nix
   ];
 
@@ -65,6 +67,11 @@
 
   networking.hostName = "nix-nas";
 
+
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
   users.users = {
     admin = {
       # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
@@ -75,38 +82,31 @@
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKqykgN7RuOz+6YCDWYTeXfGKRHT5VXG/LJWGN1zFro"
       ];
       # TODO: Be sure to add any other groups you need (such as networkmanager, audio, docker, etc)
-      extraGroups = [ "wheel" ];
+      extraGroups = [ "wheel" "media" ];
     };
   };
 
   programs.nix-ld.enable = true;
 
-  virtualisation.vmVariant = {
-    # following configuration is added only when building VM with build-vm
-    virtualisation = {
-      memorySize = 8192; # Use 2048MiB memory.
-      cores = 4;
-      graphics = false;
-    };
-  };
-
   networking = {
-    # For vm Testing
-    usePredictableInterfaceNames = false;
 
     firewall.enable = true;
 
-    nameservers = [ "1.1.1.1" "8.8.8.8" "9.9.9.9" ];
+    # nameservers = [ "1.1.1.1" "8.8.8.8" ];
 
     nat = {
       enable = true;
       internalInterfaces = [ "ve-+" ];
-      externalInterface = "eth0";
+      externalInterface = "enp2s0";
       # Lazy IPv6 connectivity for the containe
     };
   };
 
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    useRoutingFeatures = "server";
+    openFirewall = true;
+  };
 
   environment.systemPackages = (with pkgs;[
     git

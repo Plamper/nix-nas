@@ -1,13 +1,13 @@
 { config, ... }:
 {
   # Configure ACME appropriately
-  # security.acme.acceptTerms = true;
-  # security.acme.defaults = {
-  #   email = "felix.plamper@tuta.io";
-  #   dnsResolver = "1.1.1.1:53";
-  #   dnsProvider = "cloudflare";
-  #   environmentFile = config.age.secrets."cloudflare-token".path;
-  # };
+  security.acme.acceptTerms = true;
+  security.acme.defaults = {
+    email = "felix.plamper@tuta.io";
+    dnsResolver = "1.1.1.1:53";
+    dnsProvider = "cloudflare";
+    environmentFile = config.age.secrets."cloudflare-token".path;
+  };
 
   # For each virtual host you would like to use DNS-01 validation with,
   # set acmeRoot = null
@@ -24,15 +24,18 @@
 
     virtualHosts = {
       "bodenlos-schlem.men" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:7575";
         };
       };
 
-      "test-nextcloud.bodenlos-schlem.men" = {
-        # enableACME = true;
-        # acmeRoot = null;
-        # forceSSL = true;
+      "nextcloud.bodenlos-schlem.men" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
         locations."/" = {
 
           proxyPass = "http://192.168.100.11";
@@ -45,10 +48,10 @@
           # ;
         };
       };
-      "test-jellyfin.bodenlos-schlem.men" = {
-        # enableACME = true;
-        # acmeRoot = null;
-        # forceSSL = true;
+      "jellyfin.bodenlos-schlem.men" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
         locations."/" = {
 
           proxyPass = "http://192.168.100.13:8096";
@@ -61,10 +64,10 @@
           # ;
         };
       };
-      "test-arr.bodenlos-schlem.men" = {
-        # enableACME = true;
-        # acmeRoot = null;
-        # forceSSL = true;
+      "arr.bodenlos-schlem.men" = {
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
         locations."/transmission" = {
           proxyPass = "http://127.0.0.1:9091/transmission";
           proxyWebsockets = true;
@@ -90,9 +93,9 @@
 
       # Grafana Virtual Host
       ${config.services.grafana.settings.server.domain} = {
-        # enableACME = true;
-        # acmeRoot = null;
-        # forceSSL = true;
+        enableACME = true;
+        acmeRoot = null;
+        forceSSL = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
           proxyWebsockets = true;

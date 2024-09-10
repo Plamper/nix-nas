@@ -19,7 +19,7 @@
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKqykgN7RuOz+6YCDWYTeXfGKRHT5VXG/LJWGN1zFro"
       ];
 
-      extraGroups = [ "media" "pictures" "felix" "backup" ];
+      extraGroups = [ "media" "pictures" "felix" "backup" "roms" ];
     };
     borg = {
       home = "/mnt/data-pool/Backups/borg";
@@ -37,5 +37,6 @@
     media.gid = 555;
     pictures.gid = 3000;
     felix.gid = 4000;
+    roms.gid = 6000;
   };
 }

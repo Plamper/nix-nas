@@ -78,6 +78,16 @@
         "force group" = "backup";
         "valid users" = "@backup";
       };
+      Roms = {
+        path = "/mnt/data-pool/Roms/";
+        browseable = "yes";
+        "read only" = "no";
+        "guest ok" = "no";
+        "create mask" = "0640";
+        "directory mask" = "0750";
+        "force group" = "roms";
+        "valid users" = "@roms";
+      };
     };
   };
 

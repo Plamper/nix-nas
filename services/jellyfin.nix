@@ -45,41 +45,35 @@
 
       # intro skipper fix
       nixpkgs.overlays = with pkgs; [
-        (
-          final: prev:
-            {
-              jellyfin-web = prev.jellyfin-web.overrideAttrs (finalAttrs: previousAttrs: {
-                installPhase = ''
-                  runHook preInstall
+        (final: prev: {
+          jellyfin-web = prev.jellyfin-web.overrideAttrs (finalAttrs: previousAttrs: {
+            installPhase = ''
+              runHook preInstall
 
-                  # this is the important line
-                  sed -i "s#</head>#<script src=\"configurationpage?name=skip-intro-button.js\"></script></head>#" dist/index.html
+              # this is the important line
+              sed -i "s#</head>#<script src=\"configurationpage?name=skip-intro-button.js\"></script></head>#" dist/index.html
 
-                  mkdir -p $out/share
-                  cp -a dist $out/share/jellyfin-web
+              mkdir -p $out/share
+              cp -a dist $out/share/jellyfin-web
 
-                  runHook postInstall
-                '';
-              });
-            }
-        )
+              runHook postInstall
+            '';
+          });
+        })
         # https://github.com/NixOS/nixpkgs/issues/303074
         # May no longer be necessary with next nixos version
-        (
-          final: prev: {
-            jellyfin-ffmpeg = prev.jellyfin-ffmpeg.override {
-              ffmpeg_6-full = prev.ffmpeg_6-full.override {
-                withMfx = false;
-                withVpl = true;
-              };
+        (final: prev: {
+          jellyfin-ffmpeg = prev.jellyfin-ffmpeg.override {
+            ffmpeg_6-full = prev.ffmpeg_6-full.override {
+              withMfx = false;
+              withVpl = true;
             };
-          }
-        )
+          };
+        })
+        (final: prev: {
+          intel-vaapi-driver = prev.intel-vaapi-driver.override { enableHybridCodec = true; };
+        })
       ];
-
-      nixpkgs.config.packageOverrides = pkgs: {
-        vaapiIntel = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
-      };
 
       hardware.opengl = {
         # hardware.opengl in 24.05

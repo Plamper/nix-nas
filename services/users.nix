@@ -19,7 +19,7 @@
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKqykgN7RuOz+6YCDWYTeXfGKRHT5VXG/LJWGN1zFro"
       ];
 
-      extraGroups = [ "media" "picatures" "felix" "backup" ];
+      extraGroups = [ "media" "pictures" "felix" "backup" ];
     };
     borg = {
       home = "/mnt/data-pool/Backups/borg";

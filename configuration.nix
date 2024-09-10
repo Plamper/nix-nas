@@ -15,12 +15,14 @@
 
     # Services
     ./services/openssh.nix
-    # ./services/nextcloud.nix
+    ./services/nextcloud.nix
     ./services/jellyfin.nix
     ./services/arr.nix
     ./services/monitoring.nix
     # ./services/podman-containers.nix
     ./services/reverse-proxy.nix
+    ./services/users.nix
+    ./services/samba.nix
   ];
 
   nixpkgs = {
@@ -72,27 +74,14 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  users.users = {
-    admin = {
-      # If you do, you can skip setting a root password by passing '--no-root-passwd' to nixos-install.
-      # Be sure to change it (using passwd) after rebooting!
-      initialPassword = "123";
-      isNormalUser = true;
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKqykgN7RuOz+6YCDWYTeXfGKRHT5VXG/LJWGN1zFro"
-      ];
-      # TODO: Be sure to add any other groups you need (such as networkmanager, audio, docker, etc)
-      extraGroups = [ "wheel" "media" ];
-    };
-  };
-
+  
   programs.nix-ld.enable = true;
 
   networking = {
 
     firewall.enable = true;
 
-    # nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    # nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
 
     nat = {
       enable = true;
@@ -112,6 +101,7 @@
     git
     nixd
     nixpkgs-fmt
+    dig
   ]) ++ [
     inputs.agenix.packages.x86_64-linux.default
   ];

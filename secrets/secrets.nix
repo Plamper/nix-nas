@@ -10,4 +10,5 @@ in
   "vpn.age".publicKeys = keys;
   "cloudflare-token.age".publicKeys = keys;
   "nextcloud.age".publicKeys = keys;
+  "nc-pg-pass.age".publicKeys = keys;
 }

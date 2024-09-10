@@ -4,7 +4,7 @@
   security.acme.acceptTerms = true;
   security.acme.defaults = {
     email = "felix.plamper@tuta.io";
-    dnsResolver = "1.1.1.1:53";
+    # dnsResolver = "1.1.1.1:53";
     dnsProvider = "cloudflare";
     environmentFile = config.age.secrets."cloudflare-token".path;
   };
@@ -32,22 +32,12 @@
         };
       };
 
-      "nextcloud.bodenlos-schlem.men" = {
+      ${config.services.nextcloud.hostName} = {
+        forceSSL = true;
         enableACME = true;
         acmeRoot = null;
-        forceSSL = true;
-        locations."/" = {
-
-          proxyPass = "http://192.168.100.11";
-          # proxyWebsockets = true; # needed if you need to use WebSocket
-          # extraConfig =
-          #   # required when the target is also TLS server with multiple hosts
-          #   "proxy_ssl_server_name on;" +
-          #   # required when the server wants to use HTTP Authentication
-          #   "proxy_pass_header Authorization;"
-          # ;
-        };
       };
+
       "jellyfin.bodenlos-schlem.men" = {
         enableACME = true;
         acmeRoot = null;

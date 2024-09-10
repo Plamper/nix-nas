@@ -7,8 +7,6 @@
     agenix.nixosModules.default
   ];
 
-  users.groups.media.gid = 555;
-
   services.pia-wg = {
     enable = true;
     username = "p8566938";
@@ -24,16 +22,25 @@
     };
   };
 
+  # Fix tailscale dns bug
+  environment.etc."netns/pia/resolv.conf".text = ''
+    nameserver 1.1.1.1
+    options edns0
+  '';
+
+
   # environment.systemPackages = [ pkgs.flood-for-transmission ];
 
   services.transmission = {
     enable = true;
     package = pkgs.transmission_4;
+    group = "media";
+    openRPCPort = true;
     settings = {
       download-dir = "/mnt/data-pool/media/torrent";
       #Override default settings
-      rpc-bind-address = "0.0.0.0"; #Bind to own IP
-      rpc-whitelist = "127.0.0.1,192.168.1.*"; #Whitelist your remote machine (10.0.0.1 in this example)
+      # rpc-bind-address = "0.0.0.0"; #Bind to own IP
+      rpc-whitelist = "127.0.0.1,192.168.1.*";
     };
   };
 

@@ -23,7 +23,7 @@
       {
         job_name = "nextcloud";
         static_configs = [{
-          targets = [ "192.168.100.11:9000" ];
+          targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.nextcloud.port}" ];
         }];
       }
     ];

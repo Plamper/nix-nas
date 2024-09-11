@@ -38,5 +38,6 @@
     pictures.gid = 3000;
     felix.gid = 4000;
     roms.gid = 6000;
+    email.gid = 777;
   };
 }

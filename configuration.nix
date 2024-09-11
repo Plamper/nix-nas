@@ -23,6 +23,7 @@
     ./services/reverse-proxy.nix
     ./services/users.nix
     ./services/samba.nix
+    ./services/email.nix
   ];
 
   nixpkgs = {

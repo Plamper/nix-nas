@@ -11,4 +11,5 @@ in
   "cloudflare-token.age".publicKeys = keys;
   "nextcloud.age".publicKeys = keys;
   "nc-pg-pass.age".publicKeys = keys;
+  "gmail.age".publicKeys = keys;
 }

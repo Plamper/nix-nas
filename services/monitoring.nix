@@ -26,6 +26,12 @@
           targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.nextcloud.port}" ];
         }];
       }
+      {
+        job_name = "zfs";
+        static_configs = [{
+          targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.zfs.port}" ];
+        }];
+      }
     ];
 
     exporters = {

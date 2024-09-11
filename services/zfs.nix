@@ -9,4 +9,9 @@
   boot.zfs.extraPools = [ "data-pool" ];
 
   services.smartd.enable = true;
+
+  services.prometheus.exporters.zfs= {
+    enable = true;
+    port = 9006;
+  };
 }

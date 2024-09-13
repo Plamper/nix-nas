@@ -120,6 +120,8 @@
 
       services.resolved.enable = true;
 
+      time.timeZone = lib.mkDefault "Europe/Berlin";
+
     };
   };
 }

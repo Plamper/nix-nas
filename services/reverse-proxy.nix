@@ -32,10 +32,13 @@
         };
       };
 
-      ${config.services.nextcloud.hostName} = {
+      "nextcloud.bodenlos-schlem.men" = {
         forceSSL = true;
         enableACME = true;
         acmeRoot = null;
+        locations."/" = {
+          proxyPass = "http://192.168.100.11";
+        };
       };
 
       "jellyfin.bodenlos-schlem.men" = {

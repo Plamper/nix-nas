@@ -75,6 +75,7 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  time.timeZone = lib.mkDefault "Europe/Berlin";
   
   programs.nix-ld.enable = true;
 
@@ -94,7 +95,6 @@
 
   services.tailscale = {
     enable = true;
-    useRoutingFeatures = "server";
     openFirewall = true;
   };
 

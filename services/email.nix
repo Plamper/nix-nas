@@ -14,7 +14,8 @@
     accounts = {
       default = {
         host = "smtp.gmail.com";
-        passwordeval = "cat ${config.age.secrets."gmail".path}";
+        # smartmontools can only access sed not cat
+        passwordeval = "sed '' ${config.age.secrets."gmail".path}";
         user = "g9922590@gmail.com";
         from = "g9922590@gmail.com";
       };

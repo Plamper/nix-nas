@@ -91,6 +91,21 @@
           default_phone_region = "DE";
           maintenance_window_start = 6;
           trusted_proxies = [ "192.168.100.10" ];
+          # Enable PDF and HEIC
+          enabledPreviewProviders = [
+          "OC\\Preview\\BMP"
+          "OC\\Preview\\GIF"
+          "OC\\Preview\\JPEG"
+          "OC\\Preview\\Krita"
+          "OC\\Preview\\MarkDown"
+          "OC\\Preview\\MP3"
+          "OC\\Preview\\OpenDocument"
+          "OC\\Preview\\PNG"
+          "OC\\Preview\\TXT"
+          "OC\\Preview\\XBitmap"
+          "OC\\Preview\\HEIC"
+          "OC\\Preview\\PDF"
+        ];
         };
       };
 

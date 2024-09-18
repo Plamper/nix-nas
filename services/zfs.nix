@@ -23,8 +23,11 @@
   # this option does not work; will return error
   services.zfs.zed.enableMail = false;
 
+  environment.systemPackages = [ pkgs.smartmontools ];
+
   services.smartd = {
     enable = true;
+    notifications.mail.enable = true;
   };
 
   services.prometheus.exporters.zfs = {

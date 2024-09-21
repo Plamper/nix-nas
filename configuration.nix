@@ -19,7 +19,7 @@
     ./services/jellyfin.nix
     ./services/arr.nix
     ./services/monitoring.nix
-    # ./services/podman-containers.nix
+    ./services/podman-containers.nix
     ./services/reverse-proxy.nix
     ./services/users.nix
     ./services/samba.nix

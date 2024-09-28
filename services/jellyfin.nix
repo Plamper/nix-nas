@@ -95,7 +95,7 @@
       services.jellyfin = {
         enable = true;
         openFirewall = true;
-        # group = "media";
+        group = "media";
       };
       environment.systemPackages = [
         pkgs.jellyfin
@@ -104,7 +104,7 @@
         pkgs.libva-utils
       ];
 
-      users.users.jellyfin.extraGroups = [ "render" "video" "media" ];
+      users.users.jellyfin.extraGroups = [ "render" "video" ];
 
       system.stateVersion = "24.05";
 

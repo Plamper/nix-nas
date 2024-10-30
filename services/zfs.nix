@@ -23,15 +23,13 @@
   # this option does not work; will return error
   services.zfs.zed.enableMail = false;
 
+  services.zfs.autoSnapshot.enable = true;
+  services.zfs.autoScrub.enable = true;
+
   environment.systemPackages = [ pkgs.smartmontools ];
 
   services.smartd = {
     enable = true;
     notifications.mail.enable = true;
-  };
-
-  services.prometheus.exporters.zfs = {
-    enable = true;
-    port = 9006;
   };
 }

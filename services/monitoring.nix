@@ -43,12 +43,6 @@
           targets = [ "192.168.100.11:9003" ];
         }];
       }
-      {
-        job_name = "zfs";
-        static_configs = [{
-          targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.zfs.port}" ];
-        }];
-      }
     ];
 
     exporters = {

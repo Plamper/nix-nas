@@ -134,7 +134,7 @@
         # May no longer be necessary with next nixos version
         (final: prev: {
           jellyfin-ffmpeg = prev.jellyfin-ffmpeg.override {
-            ffmpeg_6-full = prev.ffmpeg_6-full.override {
+            ffmpeg_7-full = prev.ffmpeg_7-full.override {
               withMfx = false;
               withVpl = true;
             };
@@ -145,14 +145,13 @@
         })
       ];
 
-      hardware.opengl = {
-        # hardware.opengl in 24.05
+      hardware.graphics = {
         enable = true;
         extraPackages = with pkgs; [
           intel-media-driver
           intel-vaapi-driver # previously vaapiIntel
           vaapiVdpau
-          onevpl-intel-gpu # QSV on 11th gen or newer
+          vpl-gpu-rt # QSV on 11th gen or newer
           # intel-media-sdk # QSV up to 11th gen
         ];
       };

@@ -4,9 +4,10 @@
   security.acme.acceptTerms = true;
   security.acme.defaults = {
     email = "felix.plamper@tuta.io";
-    # dnsResolver = "1.1.1.1:53";
+    dnsResolver = "1.1.1.1:53";
     dnsProvider = "cloudflare";
     environmentFile = config.age.secrets."cloudflare-token".path;
+    extraLegoFlags = [ "--dns.propagation-wait=15s" ]; # Dns Propagation check does not work
   };
 
   # For each virtual host you would like to use DNS-01 validation with,
@@ -38,6 +39,10 @@
         acmeRoot = null;
         locations."/" = {
           proxyPass = "http://192.168.100.11";
+          # Upload large files to nextcloud
+          extraConfig = "
+            client_max_body_size 512m;
+          ";
         };
       };
 

@@ -84,6 +84,7 @@
     firewall.enable = true;
 
     # nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+    enableIPv6 = false;
 
     nat = {
       enable = true;
@@ -103,6 +104,7 @@
     nixd
     nixpkgs-fmt
     dig
+    helix
   ]) ++ [
     inputs.agenix.packages.x86_64-linux.default
   ];

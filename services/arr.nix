@@ -72,6 +72,8 @@
           alt-speed-time-end = 1380;
           seed-queue-enabled = true;
           seed-queue-size = 3;
+          ratio-limit = 10;
+          ratio-limit-enabled = true;
 
           # Disable UPnP
           port-forwarding-enabled = false;
@@ -86,6 +88,13 @@
         RootDirectory = lib.mkForce "";
       };
 
+      # Sonarr is dotnet 6 app which is marked is insecure
+      nixpkgs.config.permittedInsecurePackages = [
+        "aspnetcore-runtime-wrapped-6.0.36"
+        "aspnetcore-runtime-6.0.36"
+        "dotnet-sdk-wrapped-6.0.428"
+        "dotnet-sdk-6.0.428"
+      ];
 
       services.sonarr = {
         enable = true;

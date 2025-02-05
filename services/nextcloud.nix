@@ -80,7 +80,7 @@
         # Recognize has to be installed from AppStore as models are unable to be downloaded
         appstoreEnable = true;
         extraApps = {
-          inherit (config.services.nextcloud.package.packages.apps) contacts calendar tasks memories previewgenerator notes;
+          inherit (config.services.nextcloud.package.packages.apps) contacts calendar tasks previewgenerator notes;
         };
         extraAppsEnable = true;
         maxUploadSize = "10G";

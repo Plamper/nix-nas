@@ -1,10 +1,12 @@
-{ inputs
-, lib
-, config
-, pkgs
-, modulesPath
-, ...
-}: {
+{
+  inputs,
+  lib,
+  config,
+  pkgs,
+  modulesPath,
+  ...
+}:
+{
 
   imports = [
     # (modulesPath + "/virtualisation/virtualbox-image.nix")
@@ -59,6 +61,8 @@
         flake-registry = "";
         # Workaround for https://github.com/NixOS/nix/issues/9574
         nix-path = config.nix.nixPath;
+
+        trusted-users = [ "@wheel" ];
       };
       # Opinionated: disable channels
       channel.enable = false;
@@ -70,13 +74,12 @@
 
   networking.hostName = "nix-nas";
 
-
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   time.timeZone = lib.mkDefault "Europe/Berlin";
-  
+
   programs.nix-ld.enable = true;
 
   networking = {
@@ -99,16 +102,18 @@
     openFirewall = true;
   };
 
-  environment.systemPackages = (with pkgs;[
-    git
-    nixd
-    nixpkgs-fmt
-    dig
-    helix
-    gitui
-  ]) ++ [
-    inputs.agenix.packages.x86_64-linux.default
-  ];
+  environment.systemPackages =
+    (with pkgs; [
+      git
+      nixd
+      nixpkgs-fmt
+      dig
+      helix
+      gitui
+    ])
+    ++ [
+      inputs.agenix.packages.x86_64-linux.default
+    ];
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";

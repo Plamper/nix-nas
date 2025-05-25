@@ -4,6 +4,7 @@ let
   test-vm-key-admin = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGwN68PStruvwNlb91jPuUlhLQyCgKP/umNGo1Bo+d5G";
   nas-admin-key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFPwAlKNggifROXV1CBjjVNwgkSSa3t15muTo40ZeysS";
   nas-host-key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJQddURjXQPlTzWOB+cwTGCTcOliJUY44hfe3YtD8pP";
+  cloudnix-key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBGSyXZ/ceJRilbbX3CMveGLZV1TXWQY0oUPq4hTGKTP";
   keys = [ pc-key test-vm-key test-vm-key-admin nas-admin-key nas-host-key ];
 in
 {

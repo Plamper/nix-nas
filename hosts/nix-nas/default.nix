@@ -11,11 +11,14 @@
   imports = [
     # (modulesPath + "/virtualisation/virtualbox-image.nix")
     ./hardware-configuration.nix
-    ./secrets
+    ../../secrets
 
-    ./services/zfs.nix
+    # Shared modules
+    ../shared
+
 
     # Services
+    ./services/zfs.nix
     ./services/openssh.nix
     ./services/nextcloud.nix
     ./services/jellyfin.nix
@@ -49,36 +52,12 @@
     hostPlatform = "x86_64-linux";
   };
 
-  nix =
-    let
-      flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;
-    in
-    {
-      settings = {
-        # Enable flakes and new 'nix' command
-        experimental-features = "nix-command flakes";
-        # Opinionated: disable global registry
-        flake-registry = "";
-        # Workaround for https://github.com/NixOS/nix/issues/9574
-        nix-path = config.nix.nixPath;
-
-        trusted-users = [ "@wheel" ];
-      };
-      # Opinionated: disable channels
-      channel.enable = false;
-
-      # Opinionated: make flake registry and nix path match flake inputs
-      registry = lib.mapAttrs (_: flake: { inherit flake; }) flakeInputs;
-      nixPath = lib.mapAttrsToList (n: _: "${n}=flake:${n}") flakeInputs;
-    };
-
   networking.hostName = "nix-nas";
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  time.timeZone = lib.mkDefault "Europe/Berlin";
 
   programs.nix-ld.enable = true;
 
@@ -102,18 +81,6 @@
     openFirewall = true;
   };
 
-  environment.systemPackages =
-    (with pkgs; [
-      git
-      nixd
-      nixpkgs-fmt
-      dig
-      helix
-      gitui
-    ])
-    ++ [
-      inputs.agenix.packages.x86_64-linux.default
-    ];
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";

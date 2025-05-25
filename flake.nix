@@ -14,6 +14,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    disko = {
+      url = "github:nix-community/disko/latest";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     pia-nix = {
       url = "github:Atte/pia-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -27,6 +32,7 @@
       agenix,
       pia-nix,
       deploy-rs,
+      disko,
       ...
     }@inputs:
     let
@@ -63,7 +69,7 @@
           };
           system = "x86_64-linux";
           modules = [
-            ./configuration.nix
+            ./hosts/nix-nas
             agenix.nixosModules.default
           ];
         };
@@ -76,6 +82,35 @@
         profiles.system = {
           user = "root";
           path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.nix-nas;
+        };
+      };
+
+      nixosConfigurations = {
+        cloudnix = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit
+              inputs
+              outputs
+              pia-nix
+              agenix
+              ;
+          };
+          system = "aarch64-linux";
+          modules = [
+            ./hosts/cloudnix
+            agenix.nixosModules.default
+            disko.nixosModules.disko
+          ];
+        };
+      };
+
+      deploy.nodes.cloudnix = {
+        hostname = "150.230.147.99";
+        sshUser = "admin";
+        remoteBuild = true;
+        profiles.system = {
+          user = "root";
+          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.cloudnix;
         };
       };
     };

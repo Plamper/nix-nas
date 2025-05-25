@@ -59,12 +59,13 @@
         age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
         age.secrets = {
           "nextcloud" = {
-            file = ../secrets/nextcloud.age;
+          # Find better solution
+            file = ../../../secrets/nextcloud.age;
             owner = "nextcloud";
             group = "nextcloud";
           };
           "nc-pg-pass" = {
-            file = ../secrets/nc-pg-pass.age;
+            file = ../../../secrets/nc-pg-pass.age;
             owner = "nextcloud";
             group = "nextcloud";
           };

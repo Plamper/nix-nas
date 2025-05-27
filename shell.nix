@@ -1,6 +1,5 @@
-# Shell for bootstrapping flake-enabled nix and home-manager
-# You can enter it through 'nix develop' or (legacy) 'nix-shell'
-
+# Shell for bootstrapping flake-enabled nix
+# afterwards use nix develop
 {
   pkgs ? (import ./nixpkgs.nix) { },
 }:
@@ -10,11 +9,9 @@
     NIX_CONFIG = "experimental-features = nix-command flakes";
     nativeBuildInputs = with pkgs; [
       nix
-      nixd
-      git
-      ragenix
-      deploy-rs
     ];
+    shellHook = ''
+      nix develop
+    '';
   };
 }
-

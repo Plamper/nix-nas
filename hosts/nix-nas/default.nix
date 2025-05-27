@@ -81,6 +81,35 @@
     openFirewall = true;
   };
 
+  networking.wireguard.enable = true;
+  networking.wireguard.interfaces = {
+    # "wg0" is the network interface name. You can name the interface arbitrarily.
+    wg0 = {
+      # Determines the IP address and subnet of the client's end of the tunnel interface.
+      ips = [ "10.20.0.2/24" ];
+      # listenPort = 51820; # to match firewall allowedUDPPorts (without this wg uses random port numbers)
+
+      privateKeyFile = config.age.secrets.nix-nas-private-key.path;
+
+      peers = [
+        # For a client configuration, one peer entry for the server will suffice.
+
+        {
+          # Public key of the server (not a file path).
+          publicKey = "45qWd/gUOc2xVUWK0jtrp3FD81qdwtVGDVRARcM3oQs=";
+          # Or forward only particular subnets
+          allowedIPs = [ "10.20.0.0/24" ];
+
+          # Set this to the server IP and port.
+          endpoint = "150.230.147.99:51820"; # ToDo: route to endpoint not automatically configured https://wiki.archlinux.org/index.php/WireGuard#Loop_routing https://discourse.nixos.org/t/solved-minimal-firewall-setup-for-wireguard-client/7577
+
+          # Send keepalives every 25 seconds. Important to keep NAT tables alive.
+          persistentKeepalive = 25;
+        }
+      ];
+    };
+  };
+
 
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";

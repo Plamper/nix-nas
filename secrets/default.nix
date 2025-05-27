@@ -6,5 +6,7 @@
       file = ./gmail.age;
       group = "email";
     };
+    # cloudnix-private-key.file = ./wireguard-keys/cloudnix-private.age;
+    nix-nas-private-key.file = ./wireguard-keys/nix-nas-private.age;
   };
 }

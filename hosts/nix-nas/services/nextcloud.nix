@@ -59,7 +59,7 @@
         age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
         age.secrets = {
           "nextcloud" = {
-          # Find better solution
+            # Find better solution
             file = ../../../secrets/nextcloud.age;
             owner = "nextcloud";
             group = "nextcloud";
@@ -106,23 +106,26 @@
             "memories.exiftool" = "${lib.getExe pkgs.exiftool}";
             "memories.vod.ffmpeg" = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
             "memories.vod.ffprobe" = "${pkgs.jellyfin-ffmpeg}/bin/ffprobe";
+            preview_ffmpeg_path = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
             default_phone_region = "DE";
             maintenance_window_start = 6;
-            trusted_proxies = [ "192.168.100.10" ];
+            trusted_proxies = [
+              "192.168.100.10"
+              "10.20.0.1"
+              "150.230.147.99"
+            ];
             # Enable PDF and HEIC
             enabledPreviewProviders = [
-              "OC\\Preview\\BMP"
-              "OC\\Preview\\GIF"
-              "OC\\Preview\\JPEG"
+              "OC\\Preview\\TIFF"
               "OC\\Preview\\Krita"
               "OC\\Preview\\MarkDown"
               "OC\\Preview\\MP3"
               "OC\\Preview\\OpenDocument"
-              "OC\\Preview\\PNG"
               "OC\\Preview\\TXT"
-              "OC\\Preview\\XBitmap"
               "OC\\Preview\\HEIC"
               "OC\\Preview\\PDF"
+              "OC\\Preview\\Image"
+              "OC\\Preview\\Movie"
             ];
           };
         };

@@ -5,7 +5,7 @@
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     agenix = {
-      url = "github:yaxitech/ragenix";
+      url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -47,12 +47,24 @@
     in
     {
 
-      devShells = forAllSystems (
+      devShell = forAllSystems (
         system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            inherit system;
+          };
         in
-        import ./shell.nix { inherit pkgs; }
+        pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [
+            nix
+            agenix.packages.${system}.default
+            nixd
+            git
+            wireguard-tools
+            deploy-rs.packages.${system}.default
+            qrencode
+          ];
+        }
       );
 
       # NixOS configuration entrypoint

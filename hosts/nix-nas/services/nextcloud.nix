@@ -54,7 +54,11 @@
       }:
       {
 
-        imports = [ agenix.nixosModules.default ];
+        imports = [
+          agenix.nixosModules.default
+          # Module which allows turning on private ip
+          ./onlyoffice.nix
+        ];
 
         age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
         age.secrets = {
@@ -69,6 +73,11 @@
             owner = "nextcloud";
             group = "nextcloud";
           };
+          onlyoffice-jwt = {
+            file = ../../../secrets/onlyoffice-jwt.age;
+            owner = "onlyoffice";
+            group = "onlyoffice";
+          };
         };
 
         services.nextcloud = {
@@ -77,6 +86,7 @@
           hostName = "nextcloud.bodenlos-schlem.men";
           https = true;
           configureRedis = true;
+          phpOptions."opcache.interned_strings_buffer" = "32";
           config = {
             adminuser = "admin";
             adminpassFile = config.age.secrets."nextcloud".path;
@@ -96,7 +106,7 @@
               contacts
               calendar
               tasks
-              previewgenerator
+              # previewgenerator
               notes
               ;
           };
@@ -114,6 +124,7 @@
               "10.20.0.1"
               "150.230.147.99"
             ];
+            files.chunked_upload.max_size = 99000000;
             # Enable PDF and HEIC
             enabledPreviewProviders = [
               "OC\\Preview\\TIFF"
@@ -130,9 +141,18 @@
           };
         };
 
+        nixpkgs.config.allowUnfree = true;
+        services.onlyoffice-fixed = {
+          enable = true;
+          hostname = "office.bodenlos-schlem.men";
+          allowLocalConnections = true;
+          jwtSecretFile = config.age.secrets.onlyoffice-jwt.path;
+        };
+
         environment.systemPackages = [
           pkgs.nodejs_20
           pkgs.jellyfin-ffmpeg
+          pkgs.ghostscript
         ];
 
         systemd.services.nextcloud-cron = {
@@ -219,8 +239,6 @@
           identMap = ''
             # ArbitraryMapName systemUser DBUser
                superuser_map      root      postgres
-               superuser_map      postgres  postgres
-               superuser_map      root      nextcloud
                # Let other names login as themselves
                superuser_map      /^(.*)$   \1
           '';

@@ -32,6 +32,20 @@
     };
   };
 
+    # Enable passwordless sudo.
+  security.sudo.extraRules = [
+    {
+      users = [ "admin" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
+
+
   users.groups = {
     backup.gid = 5000;
     media.gid = 555;

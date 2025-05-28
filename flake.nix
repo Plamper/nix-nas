@@ -90,7 +90,6 @@
       deploy.nodes.nix-nas = {
         hostname = "nix-nas";
         sshUser = "admin";
-        interactiveSudo = true;
         profiles.system = {
           user = "root";
           path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.nix-nas;

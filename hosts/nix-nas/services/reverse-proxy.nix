@@ -40,9 +40,19 @@
         locations."/" = {
           proxyPass = "http://192.168.100.11";
           # Upload large files to nextcloud
+          proxyWebsockets = true;
           extraConfig = "
             client_max_body_size 512m;
           ";
+        };
+      };
+      "office.bodenlos-schlem.men" = {
+        forceSSL = true;
+        enableACME = true;
+        acmeRoot = null;
+        locations."/" = {
+          proxyPass = "http://192.168.100.11";
+          proxyWebsockets = true;
         };
       };
 
@@ -98,6 +108,16 @@
           proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
           proxyWebsockets = true;
         };
+      };
+    };
+  };
+
+  services.cloudflared = {
+    enable = true;
+    tunnels = {
+      "418e37a3-68a1-43e4-949b-a1f38ff4d9b7" = {
+        credentialsFile = config.age.secrets.cloudflared-creds.path;
+        default = "http_status:404";
       };
     };
   };

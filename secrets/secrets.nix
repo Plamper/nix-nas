@@ -10,7 +10,9 @@ in
   "cloudflare-token.age".publicKeys = keys;
   "nextcloud.age".publicKeys = keys;
   "nc-pg-pass.age".publicKeys = keys;
+  "onlyoffice-jwt.age".publicKeys = keys;
   "gmail.age".publicKeys = keys;
+  "cloudflare-creds.age".publicKeys = [ nas-host-key pc-key ];
   "wireguard-keys/cloudnix-private.age".publicKeys = [ cloudnix-key pc-key ];
   "wireguard-keys/nix-nas-private.age".publicKeys = [ nas-host-key pc-key ];
   "wireguard-keys/nextcloud-private.age".publicKeys = [ nas-host-key pc-key ];

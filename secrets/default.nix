@@ -9,5 +9,6 @@
     # cloudnix-private-key.file = ./wireguard-keys/cloudnix-private.age;
     nix-nas-private-key.file = ./wireguard-keys/nix-nas-private.age;
     cloudflared-creds.file = ./cloudflare-creds.age;
+    onlyoffice-docker-jwt.file = ./onlyoffice-docker-jwt.age;
   };
 }

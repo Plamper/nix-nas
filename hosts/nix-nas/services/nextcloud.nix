@@ -78,7 +78,30 @@
             owner = "onlyoffice";
             group = "onlyoffice";
           };
+          
+          "cloudflare-token".file = ../../../secrets/cloudflare-token.age;
         };
+
+        
+        security.acme.acceptTerms = true;
+        security.acme.defaults = {
+          email = "felix.plamper@tuta.io";
+          dnsResolver = "1.1.1.1:53";
+          dnsProvider = "cloudflare";
+          environmentFile = config.age.secrets."cloudflare-token".path;
+          # extraLegoFlags = [ "--dns.propagation-wait=15s" ]; # Dns Propagation check does not work
+        };
+
+
+        services.nginx.virtualHosts = {
+          "nextcloud.bodenlos-schlem.men" = {
+            forceSSL = true;
+            enableACME = true;
+            acmeRoot = null;
+          };
+
+        };
+
 
         services.nextcloud = {
           enable = true;
@@ -108,6 +131,7 @@
               tasks
               # previewgenerator
               notes
+              onlyoffice
               ;
           };
           extraAppsEnable = true;
@@ -141,13 +165,6 @@
           };
         };
 
-        nixpkgs.config.allowUnfree = true;
-        services.onlyoffice-fixed = {
-          enable = true;
-          hostname = "office.bodenlos-schlem.men";
-          allowLocalConnections = true;
-          jwtSecretFile = config.age.secrets.onlyoffice-jwt.path;
-        };
 
         environment.systemPackages = [
           pkgs.nodejs_20
@@ -262,7 +279,7 @@
         networking = {
           firewall = {
             enable = true;
-            allowedTCPPorts = [ 80 ];
+            allowedTCPPorts = [ 80 443 ];
           };
           # Use systemd-resolved inside the container
           # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686

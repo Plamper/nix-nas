@@ -7,12 +7,19 @@ let
 in
 {
   "vpn.age".publicKeys = keys;
+  "pia.age".publicKeys = keys;
+  "pia-env.age".publicKeys = keys;
   "cloudflare-token.age".publicKeys = keys;
   "nextcloud.age".publicKeys = keys;
   "nc-pg-pass.age".publicKeys = keys;
   "onlyoffice-jwt.age".publicKeys = keys;
   "onlyoffice-docker-jwt.age".publicKeys = keys;
   "gmail.age".publicKeys = keys;
+  "dyn-channel-token.age".publicKeys = keys;
+  "muse-env.age".publicKeys = keys;
+  "lldap_user_pass.age".publicKeys = keys;
+  "lldap_jwt_secret.age".publicKeys = keys;
+  "lldap-priv-key.age".publicKeys = keys;
   "cloudflare-creds.age".publicKeys = [ nas-host-key pc-key ];
   "wireguard-keys/cloudnix-private.age".publicKeys = [ cloudnix-key pc-key ];
   "wireguard-keys/nix-nas-private.age".publicKeys = [ nas-host-key pc-key ];

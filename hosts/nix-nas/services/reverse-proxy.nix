@@ -72,26 +72,39 @@
           # ;
         };
       };
+      "192.168.178.141" = {
+        locations."/" = {
+
+          proxyPass = "http://192.168.100.13:8096";
+          proxyWebsockets = true; # needed if you need to use WebSocket
+          # extraConfig =
+          #   # required when the target is also TLS server with multiple hosts
+          #   "proxy_ssl_server_name on;" +
+          #   # required when the server wants to use HTTP Authentication
+          #   "proxy_pass_header Authorization;"
+          # ;
+        };
+      };
       "arr.bodenlos-schlem.men" = {
         enableACME = true;
         acmeRoot = null;
         forceSSL = true;
         locations."/transmission" = {
-          proxyPass = "http://127.0.0.1:9091/transmission";
+          proxyPass = "http://192.168.100.15:9091/transmission";
           proxyWebsockets = true;
           recommendedProxySettings = false;
         };
 
         # Url Base Has to be manually modified in webui settings under General/URL Base
         locations."/sonarr" = {
-          proxyPass = "http://127.0.0.1:8989/sonarr";
+          proxyPass = "http://192.168.100.15:8989/sonarr";
           proxyWebsockets = true;
           extraConfig = ''
             proxy_pass_header Authorization;
           '';
         };
         locations."/sonarr/api" = {
-          proxyPass = "http://127.0.0.1:8989";
+          proxyPass = "http://192.168.100.15:8989";
           recommendedProxySettings = false;
           extraConfig = ''
             auth_basic off;

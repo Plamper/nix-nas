@@ -12,10 +12,10 @@
     # (modulesPath + "/virtualisation/virtualbox-image.nix")
     ./hardware-configuration.nix
     ../../secrets
+    inputs.dyn-channels.nixosModules.default
 
     # Shared modules
     ../shared
-
 
     # Services
     ./services/zfs.nix
@@ -29,8 +29,10 @@
     ./services/users.nix
     ./services/samba.nix
     ./services/email.nix
+    ./services/blocky.nix
+    ./services/postgres.nix
+    ./services/auth.nix
   ];
-
   nixpkgs = {
     # You can add overlays here
     overlays = [
@@ -58,7 +60,6 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-
   programs.nix-ld.enable = true;
 
   networking = {
@@ -66,7 +67,7 @@
     firewall.enable = true;
 
     # nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
-    enableIPv6 = false;
+    # enableIPv6 = false;
 
     nat = {
       enable = true;
@@ -110,7 +111,11 @@
     };
   };
 
-
+  # Discord Bot
+  services.dynamic-channels-bot = {
+    enable = true;
+    tokenFile = config.age.secrets.dyn-channel-token.path;
+  };
   # https://nixos.wiki/wiki/FAQ/When_do_I_update_stateVersion
   system.stateVersion = "24.05";
 }

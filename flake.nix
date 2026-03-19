@@ -3,7 +3,8 @@
 
   inputs = {
     # Nixpkgs
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -19,8 +20,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    pia-nix = {
-      url = "github:Atte/pia-nix";
+    dyn-channels = {
+      url = "github:Plamper/Dynamic-Voice-Channels";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -30,7 +31,6 @@
       self,
       nixpkgs,
       agenix,
-      pia-nix,
       deploy-rs,
       disko,
       ...
@@ -59,6 +59,7 @@
             nix
             agenix.packages.${system}.default
             nixd
+            nixfmt-rfc-style
             git
             wireguard-tools
             deploy-rs.packages.${system}.default
@@ -75,7 +76,6 @@
             inherit
               inputs
               outputs
-              pia-nix
               agenix
               ;
           };
@@ -102,7 +102,6 @@
             inherit
               inputs
               outputs
-              pia-nix
               agenix
               ;
           };

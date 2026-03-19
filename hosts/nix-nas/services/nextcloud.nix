@@ -105,7 +105,7 @@
 
         services.nextcloud = {
           enable = true;
-          package = pkgs.nextcloud31;
+          package = pkgs.nextcloud32;
           hostName = "nextcloud.bodenlos-schlem.men";
           https = true;
           configureRedis = true;
@@ -218,7 +218,7 @@
           extraPackages = with pkgs; [
             intel-media-driver
             intel-vaapi-driver # previously vaapiIntel
-            vaapiVdpau
+            libva-vdpau-driver
             vpl-gpu-rt # QSV on 11th gen or newer
             # intel-media-sdk # QSV up to 11th gen
           ];

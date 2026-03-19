@@ -3,9 +3,12 @@
   lib,
   pkgs,
   config,
+  agenix,
   ...
 }:
 {
+
+  imports = [ ./authelia-nginx.nix ];
 
   # Stuff thats should be present on all hosts
 
@@ -14,11 +17,11 @@
     [
       git
       nixd
-      nixpkgs-fmt
+      nixfmt
       dig
       helix
       lazygit
-      ragenix
+      agenix.packages.${pkgs.system}.default
     ]
   );
 

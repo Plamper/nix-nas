@@ -1,0 +1,2 @@
+[language-server.nixd.config.nixd]
+formatting.command = [ "nixfmt" ]

@@ -24,4 +24,7 @@ in
   "wireguard-keys/cloudnix-private.age".publicKeys = [ cloudnix-key pc-key ];
   "wireguard-keys/nix-nas-private.age".publicKeys = [ nas-host-key pc-key ];
   "wireguard-keys/nextcloud-private.age".publicKeys = [ nas-host-key pc-key ];
+  "authelia-jwt.age".publicKeys = keys;
+  "authelia-storageEncryptionKey.age".publicKeys = keys;
+  "authelia-sessionSecret.age".publicKeys = keys;
 }

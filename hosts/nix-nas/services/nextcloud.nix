@@ -79,25 +79,13 @@
             group = "onlyoffice";
           };
           
-          "cloudflare-token".file = ../../../secrets/cloudflare-token.age;
         };
-
-        
-        security.acme.acceptTerms = true;
-        security.acme.defaults = {
-          email = "felix.plamper@tuta.io";
-          dnsResolver = "1.1.1.1:53";
-          dnsProvider = "cloudflare";
-          environmentFile = config.age.secrets."cloudflare-token".path;
-          # extraLegoFlags = [ "--dns.propagation-wait=15s" ]; # Dns Propagation check does not work
-        };
-
 
         services.nginx.virtualHosts = {
-          "nextcloud.bodenlos-schlem.men" = {
-            forceSSL = true;
-            enableACME = true;
-            acmeRoot = null;
+          "cloud.plamper.org" = {
+            addSSL = false;   # Disables SSL for this host
+            forceSSL = false; 
+            enableACME = false;
           };
 
         };
@@ -106,8 +94,8 @@
         services.nextcloud = {
           enable = true;
           package = pkgs.nextcloud32;
-          hostName = "nextcloud.bodenlos-schlem.men";
-          https = true;
+          hostName = "cloud.plamper.org";
+          https = false;
           configureRedis = true;
           phpOptions."opcache.interned_strings_buffer" = "32";
           config = {
@@ -149,6 +137,7 @@
               "150.230.147.99"
             ];
             files.chunked_upload.max_size = 99000000;
+            overwriteprotocol = "https";
             # Enable PDF and HEIC
             enabledPreviewProviders = [
               "OC\\Preview\\TIFF"

@@ -33,7 +33,7 @@
         };
       };
 
-      "nextcloud.bodenlos-schlem.men" = {
+      "cloud.plamper.org" = {
         forceSSL = true;
         enableACME = true;
         acmeRoot = null;
@@ -46,7 +46,7 @@
           ";
         };
       };
-      "office.bodenlos-schlem.men" = {
+      "office.plamper.org" = {
         forceSSL = true;
         enableACME = true;
         acmeRoot = null;

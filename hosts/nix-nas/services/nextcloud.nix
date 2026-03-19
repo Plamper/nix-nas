@@ -14,18 +14,6 @@
     localAddress = "192.168.100.11";
 
     bindMounts = {
-      "/Felix" = {
-        hostPath = "/mnt/data-pool/Felix";
-        isReadOnly = false;
-      };
-    };
-    bindMounts = {
-      "/Photos" = {
-        hostPath = "/mnt/data-pool/Pictures/";
-        isReadOnly = false;
-      };
-    };
-    bindMounts = {
       "/Nextcloud" = {
         hostPath = "/mnt/data-pool/nextcloud";
         isReadOnly = false;
@@ -78,7 +66,6 @@
             owner = "onlyoffice";
             group = "onlyoffice";
           };
-          
         };
 
         services.nginx.virtualHosts = {
@@ -120,6 +107,8 @@
               # previewgenerator
               notes
               onlyoffice
+              # needs to be configured in web-ui
+              user_oidc
               ;
           };
           extraAppsEnable = true;
@@ -131,6 +120,8 @@
             preview_ffmpeg_path = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
             default_phone_region = "DE";
             maintenance_window_start = 6;
+            allow_user_to_change_display_name = false;
+            lost_password_link = "disabled";
             trusted_proxies = [
               "192.168.100.10"
               "10.20.0.1"
@@ -184,6 +175,7 @@
           pictures.gid = 3000;
           felix.gid = 4000;
         };
+
 
         # Patch ffmpeg and intel vaapi driver for qsv
         nixpkgs.overlays = with pkgs; [

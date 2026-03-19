@@ -27,4 +27,7 @@ in
   "authelia-jwt.age".publicKeys = keys;
   "authelia-storageEncryptionKey.age".publicKeys = keys;
   "authelia-sessionSecret.age".publicKeys = keys;
+  "authelia-oidcHmacSecret.age".publicKeys = keys;
+  "authelia-oidcIssuerPrivateKey.age".publicKeys = keys;
+  "authelia-nextCloudOidcSecret.age".publicKeys = keys;
 }

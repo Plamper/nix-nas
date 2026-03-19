@@ -31,6 +31,16 @@
       group = config.services.authelia.instances.main.group;
       mode = "440";
     };
+    authelia-oidcHmacSecret = {
+      file = ../../../secrets/authelia-oidcHmacSecret.age;
+      group = config.services.authelia.instances.main.group;
+      mode = "440";
+    };
+    authelia-oidcIssuerPrivateKey = {
+      file = ../../../secrets/authelia-oidcIssuerPrivateKey.age;
+      group = config.services.authelia.instances.main.group;
+      mode = "440";
+    };
     lldap_user_pass_authelia = {
       file = ../../../secrets/lldap_user_pass.age;
       group = config.services.authelia.instances.main.group;
@@ -89,6 +99,8 @@
       jwtSecretFile = config.age.secrets.authelia-jwt.path;
       storageEncryptionKeyFile = config.age.secrets.authelia-storageEncryptionKey.path;
       sessionSecretFile = config.age.secrets.authelia-sessionSecret.path;
+      oidcIssuerPrivateKeyFile = config.age.secrets.authelia-oidcIssuerPrivateKey.path;
+      oidcHmacSecretFile = config.age.secrets.authelia-oidcHmacSecret.path;
     };
     environmentVariables = {
       AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = config.age.secrets.lldap_user_pass_authelia.path;
@@ -126,7 +138,7 @@
           }
           {
             domain = [ "*.plamper.org" ];
-            policy = "one_factor";
+            policy = "two_factor";
           }
         ];
       };
@@ -164,6 +176,23 @@
         filesystem = {
           filename = "/var/lib/authelia-main/notification.txt";
         };
+      };
+
+      identity_providers.oidc = {
+        cors.endpoints = [ "authorization" "token" "revocation" "introspection" "userinfo" ];
+        clients = [
+          {
+            client_id = "nextcloud";
+            client_name = "Nextcloud";
+            client_secret = "$pbkdf2-sha512$310000$zZ/5Y7RSA4eQ2xgIvilGzQ$u46nQqf6d/MjBAw2atFhsHZE4bAbn4Rd1VQulfg4ciu7.e/vr5zNNcmX7H7RCePfFXRa1dXPhk6p/n5mB/3Xhg"; # hashed secret, see below
+            public = false;
+            authorization_policy = "one_factor";
+            redirect_uris = [ "https://cloud.plamper.org/apps/user_oidc/code" ];
+            scopes = [ "openid" "profile" "email" "groups" ];
+            userinfo_signed_response_alg = "none";
+            token_endpoint_auth_method = "client_secret_post"; 
+          }
+        ];
       };
     };
   };

@@ -17,7 +17,6 @@
 
     ./wireguard-server.nix
     ./mailserver.nix
-    ./acme.nix
   ];
 
   boot = {

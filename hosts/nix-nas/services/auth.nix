@@ -46,6 +46,11 @@
       group = config.services.authelia.instances.main.group;
       mode = "440";
     };
+    authelia-smtp-password = {
+      file = ../../../secrets/noreply-smtp-password.age;
+      group = config.services.authelia.instances.main.group;
+      mode = "440";
+    };
   };
 
   services.lldap = {
@@ -106,6 +111,7 @@
     };
     environmentVariables = {
       AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = config.age.secrets.lldap_user_pass_authelia.path;
+      AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = config.age.secrets.authelia-smtp-password.path;
     };
     settings = {
       theme = "dark";
@@ -128,6 +134,15 @@
           users_filter = "(&({username_attribute}={input})(objectClass=person))";
           groups_filter = "(&(member={dn})(objectClass=groupOfNames))";
           user = "cn=admin,ou=people,dc=plamper,dc=org";
+          attributes = {
+            extra = {
+              mailboxaddress = {
+                name = "mailboxaddress";
+                multi_valued = false;
+                value_type = "string";
+              };
+            };
+          };
         };
       };
 
@@ -140,7 +155,7 @@
           }
           {
             domain = [ "*.plamper.org" ];
-            policy = "one_factor";
+            policy = "two_factor";
           }
         ];
       };
@@ -175,8 +190,11 @@
 
       notifier = {
         disable_startup_check = false;
-        filesystem = {
-          filename = "/var/lib/authelia-main/notification.txt";
+        smtp = {
+          address = "submissions://mail.plamper.org:465";
+          username = "noreply@plamper.org";
+          sender = "Authelia <noreply@plamper.org>";
+          subject = "[Authelia] {title}";
         };
       };
 

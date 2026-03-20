@@ -24,6 +24,11 @@
       url = "github:Plamper/Dynamic-Voice-Channels";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    snm = {
+      url = "gitlab:simple-nixos-mailserver/nixos-mailserver/nixos-25.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

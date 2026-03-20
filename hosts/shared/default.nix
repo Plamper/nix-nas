@@ -27,6 +27,27 @@
 
   time.timeZone = lib.mkDefault "Europe/Berlin";
 
+  # Configure ACME appropriately for all servers
+  security.acme.acceptTerms = true;
+  security.acme.defaults = {
+    email = "felix.plamper@tuta.io";
+    dnsResolver = "1.1.1.1:53";
+    dnsProvider = "cloudflare";
+    environmentFile = config.age.secrets."cloudflare-token".path;
+    extraLegoFlags = [ "--dns.propagation-wait=15s" ]; # Dns Propagation check does not work
+  };
+
+  # All servers have default nginx set
+  services.nginx = {
+    recommendedProxySettings = true;
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
+    recommendedTlsSettings = true;
+    enable = true;
+  };
+  # Open nginx firewall Ports 
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+
   nix =
     let
       flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;

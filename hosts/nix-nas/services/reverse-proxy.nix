@@ -41,9 +41,10 @@
           proxyPass = "http://192.168.100.11";
           # Upload large files to nextcloud
           proxyWebsockets = true;
-          extraConfig = "
+          extraConfig = ''
             client_max_body_size 512m;
-          ";
+            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+          '';
         };
       };
       "office.plamper.org" = {

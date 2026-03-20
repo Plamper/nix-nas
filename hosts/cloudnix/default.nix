@@ -16,7 +16,8 @@
     ./disk-config.nix
 
     ./wireguard-server.nix
-    # ./reverse-proxy.nix
+    ./mailserver.nix
+    ./acme.nix
   ];
 
   boot = {

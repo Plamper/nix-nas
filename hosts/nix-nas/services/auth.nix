@@ -62,6 +62,8 @@
     };
   };
 
+  networking.firewall.interfaces."wg0".allowedTCPPorts = [ 3890 ];
+
   users.groups.lldap-secrets.name = "lldap-secrets";
   systemd.services.lldap.serviceConfig.SupplementaryGroups = [ "lldap-secrets" ];
 
@@ -138,7 +140,7 @@
           }
           {
             domain = [ "*.plamper.org" ];
-            policy = "two_factor";
+            policy = "one_factor";
           }
         ];
       };

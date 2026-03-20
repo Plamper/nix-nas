@@ -30,4 +30,5 @@ in
   "authelia-oidcHmacSecret.age".publicKeys = keys;
   "authelia-oidcIssuerPrivateKey.age".publicKeys = keys;
   "authelia-nextCloudOidcSecret.age".publicKeys = keys;
+  "postfix-sasl-passwd.age".publicKeys = keys;
 }

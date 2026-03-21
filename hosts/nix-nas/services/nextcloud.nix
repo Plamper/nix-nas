@@ -109,6 +109,7 @@
               onlyoffice
               # needs to be configured in web-ui
               user_oidc
+              mail
               ;
           };
           extraAppsEnable = true;

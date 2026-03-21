@@ -126,21 +126,19 @@
         format = "text";
       };
 
-      authentication_backend = {
-        ldap = {
-          address = "ldap://127.0.0.1:${toString config.services.lldap.settings.ldap_port}";
-          implementation = "lldap";
-          base_dn = config.services.lldap.settings.ldap_base_dn;
-          users_filter = "(&({username_attribute}={input})(objectClass=person))";
-          groups_filter = "(&(member={dn})(objectClass=groupOfNames))";
-          user = "cn=admin,ou=people,dc=plamper,dc=org";
-          attributes = {
-            extra = {
-              mailboxaddress = {
-                name = "mailboxaddress";
-                multi_valued = false;
-                value_type = "string";
-              };
+      authentication_backend.ldap = {
+        address = "ldap://127.0.0.1:${toString config.services.lldap.settings.ldap_port}";
+        implementation = "lldap";
+        base_dn = config.services.lldap.settings.ldap_base_dn;
+        users_filter = "(&({username_attribute}={input})(objectClass=person))";
+        groups_filter = "(&(member={dn})(objectClass=groupOfNames))";
+        user = "cn=admin,ou=people,dc=plamper,dc=org";
+        attributes = {
+          extra = {
+            mailboxaddress = {
+              name = "mailboxaddress";
+              multi_valued = false;
+              value_type = "string";
             };
           };
         };
@@ -155,7 +153,7 @@
           }
           {
             domain = [ "*.plamper.org" ];
-            policy = "two_factor";
+            policy = "one_factor";
           }
         ];
       };
@@ -199,6 +197,20 @@
       };
 
       identity_providers.oidc = {
+        claims_policies = {
+          nextcloud = {
+            custom_claims = {
+              mailboxaddress = {
+                attribute = "mailboxaddress";
+              };
+            };
+          };
+        };
+        scopes = {
+          mailbox = {
+            claims = [ "mailboxaddress" ];
+          };
+        };
         cors.endpoints = [ "authorization" "token" "revocation" "introspection" "userinfo" ];
         clients = [
           {
@@ -208,7 +220,8 @@
             public = false;
             authorization_policy = "one_factor";
             redirect_uris = [ "https://cloud.plamper.org/apps/user_oidc/code" ];
-            scopes = [ "openid" "profile" "email" "groups" ];
+            claims_policy = "nextcloud";
+            scopes = [ "openid" "profile" "email" "groups" "mailbox" ];
             userinfo_signed_response_alg = "none";
             token_endpoint_auth_method = "client_secret_post"; 
           }

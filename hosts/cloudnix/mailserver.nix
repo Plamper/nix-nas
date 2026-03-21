@@ -11,6 +11,7 @@ in
 
   age.secrets = {
     lldap_pass.file = ../../secrets/lldap_user_pass.age;
+    dovecot-masteruser.file = ../../secrets/dovecot-masterpassword.age;
     smtp_pass = {
       # [smtp.email.eu-frankfurt-1.oci.oraclecloud.com]:587 SMTP_USERNAME:SMTP_PASSWORD
       file = ../../secrets/postfix-sasl-passwd.age;
@@ -41,6 +42,7 @@ in
     dkimSigning = false;
 
     fullTextSearch.enable = true;
+    enableManageSieve = true;
 
     ldap = {
       enable = true;
@@ -77,6 +79,17 @@ in
     smtp_tls_security_level    = lib.mkForce "encrypt";
     smtp_tls_CAfile            = "/etc/ssl/certs/ca-certificates.crt";
   };
+
+  # Add a masteruser for seemless nextcloud
+  services.dovecot2.extraConfig = ''
+    auth_master_user_separator = *
+    passdb {
+      driver = passwd-file
+      args = ${config.age.secrets.dovecot-masteruser.path}
+      master = yes
+      pass = yes
+    }
+  '';
 
   # autodiscovery via thunderbird
   services.automx2 = {

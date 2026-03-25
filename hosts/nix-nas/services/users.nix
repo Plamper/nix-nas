@@ -26,6 +26,7 @@
       group = "backup";
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKqykgN7RuOz+6YCDWYTeXfGKRHT5VXG/LJWGN1zFro"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH54va+KM5cbZgmLjtW0Ppm08d5i9ZMgAIr9/KanrePj"
       ];
       isNormalUser = true;
       packages = [ pkgs.borgbackup ];

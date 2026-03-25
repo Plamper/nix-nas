@@ -1,4 +1,10 @@
-{ inputs, config, lib, pkgs, ... }:
+{
+  inputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   domain = "plamper.org";
@@ -24,7 +30,6 @@ in
     domain = config.mailserver.fqdn;
   };
 
-
   # Setup mailserver
   mailserver = {
     enable = true;
@@ -41,7 +46,20 @@ in
     # OCI does this
     dkimSigning = false;
 
-    fullTextSearch.enable = true;
+    borgbackup = {
+      enable = true;
+      repoLocation = "ssh://borg@10.20.0.2/~/mail";
+      cmdPreexec = ''
+        export BORG_RSH="ssh -i /var/vmail/.ssh/id_ed25519"
+      '';
+    };
+
+    fullTextSearch = {
+      enable = true;
+      # index new email as they arrive
+      autoIndex = true;
+      enforced = "body";
+    };
     enableManageSieve = true;
 
     ldap = {
@@ -72,12 +90,12 @@ in
 
   # OCI email delivery
   services.postfix.settings.main = {
-    relayhost                  = [ "[${ociSmtp}]:587" ];
-    smtp_sasl_auth_enable      = "yes";
+    relayhost = [ "[${ociSmtp}]:587" ];
+    smtp_sasl_auth_enable = "yes";
     smtp_sasl_security_options = "noanonymous";
-    smtp_sasl_password_maps    = "texthash:${config.age.secrets.smtp_pass.path}";
-    smtp_tls_security_level    = lib.mkForce "encrypt";
-    smtp_tls_CAfile            = "/etc/ssl/certs/ca-certificates.crt";
+    smtp_sasl_password_maps = "texthash:${config.age.secrets.smtp_pass.path}";
+    smtp_tls_security_level = lib.mkForce "encrypt";
+    smtp_tls_CAfile = "/etc/ssl/certs/ca-certificates.crt";
   };
 
   # Add a masteruser for seemless nextcloud
@@ -94,7 +112,7 @@ in
   # autodiscovery via thunderbird
   services.automx2 = {
     enable = true;
-    domain = "plamper.org"; 
+    domain = "plamper.org";
     settings = {
       version = 2;
       provider = "plamper.org";
@@ -128,5 +146,9 @@ in
     acmeRoot = null;
   };
 
-  networking.firewall.allowedTCPPorts = [ 25 465 993 ];
+  networking.firewall.allowedTCPPorts = [
+    25
+    465
+    993
+  ];
 }

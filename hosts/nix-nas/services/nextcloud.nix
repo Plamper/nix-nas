@@ -115,6 +115,13 @@
           extraAppsEnable = true;
           maxUploadSize = "10G";
           settings = {
+            mail_smtpsecure = "ssl";
+            mail_smtpport = 465;
+            mail_smtpname = "noreply@plamper.org";
+            mail_smtphost = "mail.plamper.org";
+            mail_smtpauth = true;
+            mail_from_address = "noreply";
+            mail_domain = "plamper.org";
             "memories.exiftool" = "${lib.getExe pkgs.exiftool}";
             "memories.vod.ffmpeg" = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
             "memories.vod.ffprobe" = "${pkgs.jellyfin-ffmpeg}/bin/ffprobe";

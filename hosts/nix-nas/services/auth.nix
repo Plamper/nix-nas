@@ -110,7 +110,8 @@
       oidcHmacSecretFile = config.age.secrets.authelia-oidcHmacSecret.path;
     };
     environmentVariables = {
-      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE = config.age.secrets.lldap_user_pass_authelia.path;
+      AUTHELIA_AUTHENTICATION_BACKEND_LDAP_PASSWORD_FILE =
+        config.age.secrets.lldap_user_pass_authelia.path;
       AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE = config.age.secrets.authelia-smtp-password.path;
     };
     settings = {
@@ -148,11 +149,34 @@
         default_policy = "deny";
         rules = [
           {
-            domain = [ "auth.plamper.org" ];
+            domain = [
+              "auth.plamper.org"
+              "auth.bodenlos-schlem.men"
+            ];
             policy = "bypass";
           }
+          # Allow arr_users to access transmission and sonarr
           {
-            domain = [ "*.plamper.org" ];
+            domain = [
+              "transmission.bodenlos-schlem.men"
+              "sonarr.bodenlos-schlem.men"
+            ];
+            subject = [ "group:arr_users" ];
+            policy = "one_factor";
+          }
+          # Deny access to transmission and sonarr for all users
+          {
+            domain = [
+              "transmission.bodenlos-schlem.men"
+              "sonarr.bodenlos-schlem.men"
+            ];
+            policy = "deny";
+          }
+          {
+            domain = [
+              "*.plamper.org"
+              "*.bodenlos-schlem.men"
+            ];
             policy = "one_factor";
           }
         ];
@@ -166,6 +190,11 @@
           {
             domain = "plamper.org";
             authelia_url = "https://auth.plamper.org";
+            remember_me = "1M";
+          }
+          {
+            domain = "bodenlos-schlem.men";
+            authelia_url = "https://auth.bodenlos-schlem.men";
             remember_me = "1M";
           }
         ];
@@ -211,7 +240,13 @@
             claims = [ "mailboxaddress" ];
           };
         };
-        cors.endpoints = [ "authorization" "token" "revocation" "introspection" "userinfo" ];
+        cors.endpoints = [
+          "authorization"
+          "token"
+          "revocation"
+          "introspection"
+          "userinfo"
+        ];
         clients = [
           {
             client_id = "nextcloud";
@@ -221,9 +256,15 @@
             authorization_policy = "one_factor";
             redirect_uris = [ "https://cloud.plamper.org/apps/user_oidc/code" ];
             claims_policy = "nextcloud";
-            scopes = [ "openid" "profile" "email" "groups" "mailbox" ];
+            scopes = [
+              "openid"
+              "profile"
+              "email"
+              "groups"
+              "mailbox"
+            ];
             userinfo_signed_response_alg = "none";
-            token_endpoint_auth_method = "client_secret_post"; 
+            token_endpoint_auth_method = "client_secret_post";
           }
         ];
       };
@@ -236,14 +277,26 @@
     unixSocket = "/run/redis-authelia-main/redis.sock";
     unixSocketPerm = 660;
   };
-  services.nginx.virtualHosts."auth.plamper.org" = {
-    enableACME = true;
-    forceSSL = true;
-    acmeRoot = null;
+  services.nginx.virtualHosts = {
+    "auth.plamper.org" = {
+      enableACME = true;
+      forceSSL = true;
+      acmeRoot = null;
 
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:9091";
-      proxyWebsockets = true;
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:9091";
+        proxyWebsockets = true;
+      };
+    };
+    "auth.bodenlos-schlem.men" = {
+      enableACME = true;
+      forceSSL = true;
+      acmeRoot = null;
+
+      locations."/" = {
+        proxyPass = "http://127.0.0.1:9091";
+        proxyWebsockets = true;
+      };
     };
   };
 }

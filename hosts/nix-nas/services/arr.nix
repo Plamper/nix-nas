@@ -7,6 +7,30 @@
 }:
 {
 
+  services.nginx.virtualHosts."transmission.bodenlos-schlem.men" = {
+    enableACME = true;
+    acmeRoot = null;
+    forceSSL = true;
+    enableAuthelia = true;
+
+    locations."/" = {
+      proxyPass = "http://192.168.100.15:9091";
+      extraConfig = ''
+        proxy_pass_header X-Transmission-Session-Id;
+      '';
+    };
+  };
+  services.nginx.virtualHosts."sonarr.bodenlos-schlem.men" = {
+    enableACME = true;
+    acmeRoot = null;
+    forceSSL = true;
+    enableAuthelia = true;
+
+    locations."/" = {
+      proxyPass = "http://192.168.100.15:8989/";
+    };
+  };
+
   containers.arr =
     let
       hostAddress = "192.168.100.14";
@@ -278,7 +302,7 @@
                     echo "Bind failed: $BIND_RESPONSE"
                     exit 1
                   fi
-                  
+
                   echo "Port $PORT refreshed at $(date)"
                   sleep 900
                 done
@@ -339,7 +363,9 @@
               incomplete-dir = "${config.services.transmission.settings.download-dir}/.incomplete";
               #Override default settings
               rpc-bind-address = "0.0.0.0"; # Bind to own IP
-              rpc-whitelist = "127.0.0.1,192.168.100.*";
+              rpc-whitelist = "127.0.0.1,192.168.100.*,transmission.bodenlos-schlem.men,auth.bodenlos-schlem.men";
+              # rpc_host_whitelist_enabled = false;
+              rpc-url = "/";
               speed-limit-down = 7000;
               speed-limit-down-enabled = true;
               speed-limit-up = 1000;

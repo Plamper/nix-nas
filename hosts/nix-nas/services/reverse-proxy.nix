@@ -68,32 +68,6 @@
           # ;
         };
       };
-      "arr.bodenlos-schlem.men" = {
-        enableACME = true;
-        acmeRoot = null;
-        forceSSL = true;
-        locations."/transmission" = {
-          proxyPass = "http://192.168.100.15:9091/transmission";
-          proxyWebsockets = true;
-          recommendedProxySettings = false;
-        };
-
-        # Url Base Has to be manually modified in webui settings under General/URL Base
-        locations."/sonarr" = {
-          proxyPass = "http://192.168.100.15:8989/sonarr";
-          proxyWebsockets = true;
-          extraConfig = ''
-            proxy_pass_header Authorization;
-          '';
-        };
-        locations."/sonarr/api" = {
-          proxyPass = "http://192.168.100.15:8989";
-          recommendedProxySettings = false;
-          extraConfig = ''
-            auth_basic off;
-          '';
-        };
-      };
 
       # Grafana Virtual Host
       ${config.services.grafana.settings.server.domain} = {
@@ -118,4 +92,3 @@
     };
   };
 }
-

@@ -1,5 +1,14 @@
 { config, ... }:
 {
+
+  age.secrets.smtp-password = {
+    file = ../../../secrets/noreply-smtp-password.age;
+  };
+
+  environment.etc."/aliases".text = "root: admin@plamper.org";
+
+  services.mail.sendmailSetuidWrapper.enable = true;
+
   programs.msmtp = {
     enable = true;
     setSendmail = true;
@@ -13,11 +22,11 @@
     };
     accounts = {
       default = {
-        host = "smtp.gmail.com";
+        host = "mail.plamper.org";
         # smartmontools can only access sed not cat
-        passwordeval = "sed '' ${config.age.secrets."gmail".path}";
-        user = "g9922590@gmail.com";
-        from = "g9922590@gmail.com";
+        passwordeval = "sed '' ${config.age.secrets.smtp-password.path}";
+        user = "noreply@plamper.org";
+        from = "noreply@plamper.org";
       };
     };
   };

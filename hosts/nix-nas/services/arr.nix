@@ -364,7 +364,7 @@
               #Override default settings
               rpc-bind-address = "0.0.0.0"; # Bind to own IP
               rpc-whitelist = "127.0.0.1,192.168.100.*,transmission.bodenlos-schlem.men,auth.bodenlos-schlem.men";
-              # rpc_host_whitelist_enabled = false;
+              rpc_host_whitelist_enabled = false;
               rpc-url = "/";
               speed-limit-down = 7000;
               speed-limit-down-enabled = true;

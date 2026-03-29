@@ -13,6 +13,7 @@ in
 {
   imports = [
     inputs.snm.nixosModules.default
+    ./autoconfig.nix
   ];
 
   age.secrets = {
@@ -108,43 +109,6 @@ in
       pass = yes
     }
   '';
-
-  # autodiscovery via thunderbird
-  services.automx2 = {
-    enable = true;
-    domain = "plamper.org";
-    settings = {
-      version = 2;
-      provider = "plamper.org";
-      servers = [
-        {
-          type = "imap";
-          port = 993;
-          name = "mail.plamper.org";
-          socket = "SSL";
-          authentication = "plain";
-        }
-        {
-          type = "smtp";
-          port = 465;
-          name = "mail.plamper.org";
-          socket = "SSL";
-          authentication = "plain";
-        }
-      ];
-      domains = [ "plamper.org" ];
-    };
-  };
-
-  # Cloudflare setup
-  # autoconfig.plamper.org    A      <your server IP>
-  # autodiscover.plamper.org  CNAME  autoconfig.plamper.org
-
-  services.nginx.virtualHosts."autoconfig.plamper.org" = {
-    enableACME = true;
-    forceSSL = true;
-    acmeRoot = null;
-  };
 
   networking.firewall.allowedTCPPorts = [
     25

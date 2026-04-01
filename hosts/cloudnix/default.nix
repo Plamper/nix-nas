@@ -17,6 +17,7 @@
 
     ./wireguard-server.nix
     ./mailserver.nix
+    ./fail2ban.nix
   ];
 
   boot = {

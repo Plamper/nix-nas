@@ -11,7 +11,7 @@
     bantime = "1h";
     bantime-increment = {
       enable = true; # exponentially increase ban time for repeat offenders
-      multiplier = 2;
+      factor = "4";
       maxtime = "168h"; # cap at 1 week
     };
 

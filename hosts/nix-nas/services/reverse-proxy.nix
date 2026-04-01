@@ -6,14 +6,6 @@
 
   services.nginx = {
     virtualHosts = {
-      "bodenlos-schlem.men" = {
-        enableACME = true;
-        acmeRoot = null;
-        forceSSL = true;
-        locations."/" = {
-          proxyPass = "http://127.0.0.1:7575";
-        };
-      };
 
       "cloud.plamper.org" = {
         forceSSL = true;

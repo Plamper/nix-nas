@@ -1,17 +1,8 @@
 { config, pkgs, ... }:
 {
-  virtualisation.oci-containers.containers.homarr = {
-    image = "ghcr.io/ajnart/homarr:latest";
-    ports = [ "7575:7575" ];
-    volumes = [
-      "/var/homarr/configs:/app/data/configs"
-      "/var/homarr/data:/data"
-      "/var/homarr/icons:/app/public/icons"
-    ];
-  };
 
   virtualisation.oci-containers.containers.muse = {
-    image = "ghcr.io/museofficial/muse:pr-1256";
+    image = "docker.io/dovah/muse";
     volumes = [
       "/var/muse:/data"
     ];

@@ -222,6 +222,7 @@
           username = "noreply@plamper.org";
           sender = "Authelia <noreply@plamper.org>";
           subject = "[Authelia] {title}";
+          timeout = "30s";
         };
       };
 

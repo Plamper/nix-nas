@@ -70,17 +70,16 @@
 
         services.nginx.virtualHosts = {
           "cloud.plamper.org" = {
-            addSSL = false;   # Disables SSL for this host
-            forceSSL = false; 
+            addSSL = false; # Disables SSL for this host
+            forceSSL = false;
             enableACME = false;
           };
 
         };
 
-
         services.nextcloud = {
           enable = true;
-          package = pkgs.nextcloud32;
+          package = pkgs.nextcloud33;
           hostName = "cloud.plamper.org";
           https = false;
           configureRedis = true;
@@ -123,8 +122,10 @@
             mail_from_address = "noreply";
             mail_domain = "plamper.org";
             "memories.exiftool" = "${lib.getExe pkgs.exiftool}";
+            "memories.exiftool_no_local" = false;
             "memories.vod.ffmpeg" = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
             "memories.vod.ffprobe" = "${pkgs.jellyfin-ffmpeg}/bin/ffprobe";
+            "memories.timeline.default_path" = "/Photos";
             preview_ffmpeg_path = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
             default_phone_region = "DE";
             maintenance_window_start = 6;
@@ -153,15 +154,18 @@
           };
         };
 
-
         environment.systemPackages = [
           pkgs.nodejs_20
           pkgs.jellyfin-ffmpeg
           pkgs.ghostscript
+          pkgs.exiftool
+          pkgs.tmux
         ];
 
         systemd.services.nextcloud-cron = {
-          path = [ pkgs.perl ];
+          path = [
+            pkgs.exiftool
+          ];
         };
 
         systemd.services."nextcloud-setup" = {
@@ -184,7 +188,6 @@
           felix.gid = 4000;
         };
 
-
         # Patch ffmpeg and intel vaapi driver for qsv
         nixpkgs.overlays = with pkgs; [
           # https://github.com/NixOS/nixpkgs/issues/303074
@@ -199,6 +202,17 @@
           })
           (final: prev: {
             intel-vaapi-driver = prev.intel-vaapi-driver.override { enableHybridCodec = true; };
+          })
+          (final: prev: {
+            exiftool = prev.exiftool.overrideAttrs (
+              f: p: {
+                version = "13.44";
+                src = pkgs.fetchurl {
+                  url = "https://github.com/exiftool/exiftool/archive/refs/tags/13.44.tar.gz";
+                  hash = "sha256-uiPgu1Cv+BWG8D3GBXvGDokp2o1hW1TLn6+T0EDMBRY=";
+                };
+              }
+            );
           })
         ];
 
@@ -268,7 +282,10 @@
         networking = {
           firewall = {
             enable = true;
-            allowedTCPPorts = [ 80 443 ];
+            allowedTCPPorts = [
+              80
+              443
+            ];
           };
           # Use systemd-resolved inside the container
           # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686

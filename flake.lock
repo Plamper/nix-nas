@@ -125,6 +125,26 @@
         "type": "github"
       }
     },
+    "email-autoconfig": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1776080185,
+        "narHash": "sha256-PRCmyo4oo7iTp38o9ykJ1ZFnuUnkfcjx9PRs3ZmDsZs=",
+        "owner": "plamper",
+        "repo": "nixos-email-autoconfig",
+        "rev": "24a0c12ab98ed1e56211b1531eba5a0b51829178",
+        "type": "github"
+      },
+      "original": {
+        "owner": "plamper",
+        "repo": "nixos-email-autoconfig",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -246,11 +266,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1774799055,
-        "narHash": "sha256-Tsq9BCz0q47ej1uFF39m4tuhcwru/ls6vCCJzutEpaw=",
+        "lastModified": 1775811116,
+        "narHash": "sha256-t+HZK42pB6N+i5RGbuy7Xluez/VvWbembBdvzsc23Ss=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "107cba9eb4a8d8c9f8e9e61266d78d340867913a",
+        "rev": "54170c54449ea4d6725efd30d719c5e505f1c10e",
         "type": "github"
       },
       "original": {
@@ -266,6 +286,7 @@
         "deploy-rs": "deploy-rs",
         "disko": "disko",
         "dyn-channels": "dyn-channels",
+        "email-autoconfig": "email-autoconfig",
         "nixpkgs": "nixpkgs",
         "snm": "snm"
       }

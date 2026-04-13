@@ -13,7 +13,7 @@ in
 {
   imports = [
     inputs.snm.nixosModules.default
-    ./autoconfig.nix
+    inputs.email-autoconfig.nixosModules.default
   ];
 
   age.secrets = {
@@ -109,6 +109,12 @@ in
       pass = yes
     }
   '';
+
+  email-autoconfig = {
+    enable = true;
+    domain = "plamper.org";
+    mailDomain = "mail.plamper.org";
+  };
 
   networking.firewall.allowedTCPPorts = [
     25

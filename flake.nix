@@ -4,7 +4,7 @@
   inputs = {
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
-    
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -27,6 +27,11 @@
 
     snm = {
       url = "gitlab:simple-nixos-mailserver/nixos-mailserver/nixos-25.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    email-autoconfig = {
+      url = "github:plamper/nixos-email-autoconfig";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

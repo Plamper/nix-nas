@@ -17,8 +17,8 @@
       };
       customDNS = {
         mapping = {
-          "jellyfin.bodenlos-schlem.men" = "192.168.178.141";
-          "fritz.box" = "192.168.178.1";
+          "jellyfin.bodenlos-schlem.men" = "100.77.32.104";
+          "cloud.plamper.org" = "100.77.32.104";
         };
       };
     };

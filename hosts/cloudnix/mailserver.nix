@@ -115,10 +115,4 @@ in
     domain = domain;
     mailDomain = config.mailserver.fqdn;
   };
-
-  networking.firewall.allowedTCPPorts = [
-    25
-    465
-    993
-  ];
 }

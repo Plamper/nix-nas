@@ -112,8 +112,8 @@ in
 
   email-autoconfig = {
     enable = true;
-    domain = "plamper.org";
-    mailDomain = "mail.plamper.org";
+    domain = domain;
+    mailDomain = config.mailserver.fqdn;
   };
 
   networking.firewall.allowedTCPPorts = [

@@ -267,6 +267,23 @@
             userinfo_signed_response_alg = "none";
             token_endpoint_auth_method = "client_secret_post";
           }
+          # {
+          #   client_id = "forgejo";
+          #   client_name = "Forgejo";
+          #   client_secret = "";
+          #   public = false;
+          #   authorization_policy = "two_factor";
+          #   claims_policy = "nextcloud";
+          #   scopes = [
+          #     "openid"
+          #     "profile"
+          #     "email"
+          #     "groups"
+          #     "mailbox"
+          #   ];
+          #   userinfo_signed_response_alg = "none";
+          #   token_endpoint_auth_method = "client_secret_post";
+          # }
         ];
       };
     };

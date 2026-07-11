@@ -23,7 +23,7 @@
     ./services/nextcloud.nix
     ./services/jellyfin.nix
     ./services/arr.nix
-    ./services/monitoring.nix
+    # ./services/monitoring.nix
     ./services/podman-containers.nix
     ./services/reverse-proxy.nix
     ./services/users.nix
@@ -32,6 +32,7 @@
     ./services/blocky.nix
     ./services/postgres.nix
     ./services/auth.nix
+    ./services/forgejo.nix
   ];
   nixpkgs = {
     # You can add overlays here

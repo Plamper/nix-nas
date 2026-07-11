@@ -8,6 +8,7 @@
       isNormalUser = true;
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKqykgN7RuOz+6YCDWYTeXfGKRHT5VXG/LJWGN1zFro"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILZqZT56NXAYDGmAa+UEtjeJ397awyetFlI29+3t9kg3"
       ];
       # TODO: Be sure to add any other groups you need (such as networkmanager, audio, docker, etc)
       extraGroups = [ "wheel" "media" ];
@@ -17,6 +18,7 @@
       isNormalUser = true;
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKqykgN7RuOz+6YCDWYTeXfGKRHT5VXG/LJWGN1zFro"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILZqZT56NXAYDGmAa+UEtjeJ397awyetFlI29+3t9kg3"
       ];
 
       extraGroups = [ "media" "pictures" "felix" "backup" "roms" ];
@@ -27,6 +29,7 @@
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJKqykgN7RuOz+6YCDWYTeXfGKRHT5VXG/LJWGN1zFro"
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH54va+KM5cbZgmLjtW0Ppm08d5i9ZMgAIr9/KanrePj"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILZqZT56NXAYDGmAa+UEtjeJ397awyetFlI29+3t9kg3"
       ];
       isNormalUser = true;
       packages = [ pkgs.borgbackup ];

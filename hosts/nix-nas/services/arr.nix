@@ -322,14 +322,14 @@
               ExecStart = pkgs.writeShellScript "transmission-port-update" ''
                 PORT=$(cat /tmp/pia-port.txt)
                 SESSION_ID=$(wget --server-response --output-document=/dev/null \
-                  http://127.0.0.1:9091/transmission/rpc 2>&1 \
+                  http://127.0.0.1:9091/rpc 2>&1 \
                   | grep "^\s*X-Transmission-Session-Id:" \
                   | awk '{print $2}')
                 echo "Setting Transmission peer port to $PORT"
                 wget --post-data='{"method":"session-set","arguments":{"peer-port":'"$PORT"'}}' \
                   --header='Content-Type: application/json' \
                   --header="X-Transmission-Session-Id: $SESSION_ID" \
-                  http://127.0.0.1:9091/transmission/rpc -O -
+                  http://127.0.0.1:9091/rpc -O -
               '';
             };
 

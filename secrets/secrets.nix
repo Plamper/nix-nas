@@ -3,7 +3,8 @@ let
   nas-admin-key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFPwAlKNggifROXV1CBjjVNwgkSSa3t15muTo40ZeysS";
   nas-host-key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJQddURjXQPlTzWOB+cwTGCTcOliJUY44hfe3YtD8pP";
   cloudnix-key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBGSyXZ/ceJRilbbX3CMveGLZV1TXWQY0oUPq4hTGKTP";
-  keys = [ pc-key nas-admin-key nas-host-key cloudnix-key ];
+  bitwarden-key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILZqZT56NXAYDGmAa+UEtjeJ397awyetFlI29+3t9kg3";
+  keys = [ pc-key nas-admin-key nas-host-key cloudnix-key bitwarden-key ];
 in
 {
   "vpn.age".publicKeys = keys;
@@ -33,4 +34,5 @@ in
   "postfix-sasl-passwd.age".publicKeys = keys;
   "noreply-smtp-password.age".publicKeys = keys;
   "dovecot-masterpassword.age".publicKeys = keys;
+  "vaultwarden.env.age".publicKeys = keys;
 }

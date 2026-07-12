@@ -65,6 +65,32 @@ in
     };
     enableManageSieve = true;
 
+
+    mailboxes = {
+      Drafts = {
+        auto = "subscribe";
+        special_use = "\\Drafts";
+      };
+      Junk = {
+        auto = "subscribe";
+        fts_autoindex = false;
+        special_use = "\\Junk";
+      };
+      Sent = {
+        auto = "subscribe";
+        special_use = "\\Sent";
+      };
+      Archive = {
+        auto = "subscribe";
+        special_use = "\\Archive";
+      };
+      Trash = {
+        auto = "no";
+        fts_autoindex = false;
+        special_use = "\\Trash";
+      };
+    };
+
     ldap = {
       enable = true;
 

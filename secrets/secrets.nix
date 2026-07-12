@@ -31,6 +31,7 @@ in
   "authelia-oidcHmacSecret.age".publicKeys = keys;
   "authelia-oidcIssuerPrivateKey.age".publicKeys = keys;
   "authelia-nextCloudOidcSecret.age".publicKeys = keys;
+  "immich-oauth-secret.age".publicKeys = keys;
   "postfix-sasl-passwd.age".publicKeys = keys;
   "noreply-smtp-password.age".publicKeys = keys;
   "dovecot-masterpassword.age".publicKeys = keys;

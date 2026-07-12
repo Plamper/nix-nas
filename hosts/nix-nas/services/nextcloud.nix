@@ -155,7 +155,7 @@
         };
 
         environment.systemPackages = [
-          pkgs.nodejs_20
+          pkgs.nodejs
           pkgs.jellyfin-ffmpeg
           pkgs.ghostscript
           pkgs.exiftool

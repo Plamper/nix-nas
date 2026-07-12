@@ -23,6 +23,7 @@
     ./services/nextcloud.nix
     ./services/jellyfin.nix
     ./services/arr.nix
+    ./services/immich.nix
     # ./services/monitoring.nix
     ./services/podman-containers.nix
     ./services/reverse-proxy.nix
@@ -112,6 +113,7 @@
       ];
     };
   };
+  networking.firewall.trustedInterfaces = [ "wg0" ];
 
   # Discord Bot
   services.dynamic-channels-bot = {

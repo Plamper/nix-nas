@@ -267,6 +267,25 @@
             userinfo_signed_response_alg = "none";
             token_endpoint_auth_method = "client_secret_post";
           }
+          {
+            client_id = "immich";
+            client_name = "Immich";
+            client_secret = "$argon2id$v=19$m=65536,t=3,p=4$8osR4iQFZKpohRtD+nGDkw$91b8GYwzmJpOR1nFR/L6Po5dT+gHJgSkWuHDGUiMrZY"; # hashed secret, see below
+            public = false;
+            authorization_policy = "one_factor";
+            redirect_uris = [
+              "https://photos.plamper.org/auth/login"
+              "https://photos.plamper.org/auth/callback"
+              "app.immich:///oauth-callback"
+            ];
+            scopes = [
+              "openid"
+              "profile"
+              "email"
+            ];
+            userinfo_signed_response_alg = "none";
+            token_endpoint_auth_method = "client_secret_post";
+          }
           # {
           #   client_id = "forgejo";
           #   client_name = "Forgejo";

@@ -69,7 +69,7 @@
             nix
             agenix.packages.${system}.default
             nixd
-            nixfmt-rfc-style
+            nixfmt
             git
             wireguard-tools
             deploy-rs.packages.${system}.default

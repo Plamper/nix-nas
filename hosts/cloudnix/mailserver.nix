@@ -17,8 +17,18 @@ in
   ];
 
   age.secrets = {
-    lldap_pass.file = ../../secrets/lldap_user_pass.age;
-    dovecot-masteruser.file = ../../secrets/dovecot-masterpassword.age;
+    lldap_pass = {
+      file = ../../secrets/lldap_user_pass.age;
+      owner = "root";
+      group = "root";
+      mode = "0600";
+    };
+    dovecot-masteruser = {
+      file = ../../secrets/dovecot-masterpassword.age;
+      owner = "dovecot2";
+      group = "dovecot2";
+      mode = "0600";
+    };
     smtp_pass = {
       # [smtp.email.eu-frankfurt-1.oci.oraclecloud.com]:587 SMTP_USERNAME:SMTP_PASSWORD
       file = ../../secrets/postfix-sasl-passwd.age;
@@ -34,32 +44,24 @@ in
   # Setup mailserver
   mailserver = {
     enable = true;
-    stateVersion = 3;
+    stateVersion = 5;
 
     fqdn = "mail.${domain}";
     domains = [ domain ];
 
-    certificateScheme = "acme";
+    x509.useACMEHost = config.mailserver.fqdn;
 
     enableImap = true;
     enableSubmission = true;
 
     # OCI does this
-    dkimSigning = false;
-
-    borgbackup = {
-      enable = true;
-      repoLocation = "ssh://borg@10.20.0.2/~/mail";
-      cmdPreexec = ''
-        export BORG_RSH="ssh -i /var/vmail/.ssh/id_ed25519"
-      '';
-    };
+    dkim.enable = false;
 
     fullTextSearch = {
       enable = true;
       # index new email as they arrive
       autoIndex = true;
-      enforced = "body";
+      fallback = false;
     };
     enableManageSieve = true;
 
@@ -67,24 +69,26 @@ in
       enable = true;
 
       uris = [ "ldap://10.20.0.2:3890" ];
-      searchBase = "ou=people,dc=plamper,dc=org";
+      base = "ou=people,dc=plamper,dc=org";
 
       bind = {
         dn = "uid=admin,ou=people,dc=plamper,dc=org";
         passwordFile = config.age.secrets.lldap_pass.path;
       };
 
+      attributes = {
+        uuid = "uuid";
+        mail = "mailboxAddress";
+        username = "mailboxAddress";
+      };
+
       dovecot = {
         passFilter = "(&(objectClass=person)(mailboxAddress=%{user}))";
-        passAttrs = "userPassword=password";
         userFilter = "(&(objectClass=person)(mailboxAddress=%{user}))";
-        userAttrs = null;
       };
 
       postfix = {
         filter = "(&(objectClass=person)(mailboxAddress=%s))";
-        mailAttribute = "mailboxAddress";
-        uidAttribute = "mailboxAddress";
       };
     };
   };
@@ -96,19 +100,34 @@ in
     smtp_sasl_security_options = "noanonymous";
     smtp_sasl_password_maps = "texthash:${config.age.secrets.smtp_pass.path}";
     smtp_tls_security_level = lib.mkForce "encrypt";
-    smtp_tls_CAfile = "/etc/ssl/certs/ca-certificates.crt";
+    smtp_tls_CAfile = lib.mkDefault "/etc/ssl/certs/ca-certificates.crt";
   };
 
-  # Add a masteruser for seemless nextcloud
-  services.dovecot2.extraConfig = ''
-    auth_master_user_separator = *
-    passdb {
-      driver = passwd-file
-      args = ${config.age.secrets.dovecot-masteruser.path}
-      master = yes
-      pass = yes
-    }
-  '';
+  # Borg backup for mail storage
+  services.borgbackup.jobs.mail = {
+    paths = [ config.mailserver.storage.path ];
+    repo = "ssh://borg@10.20.0.2/~/mail";
+    encryption.mode = "none";
+    environment = {
+      BORG_RSH = "ssh -i /var/vmail/.ssh/id_ed25519";
+    };
+    compression = "auto,zstd";
+    startAt = "daily";
+    persistentTimer = true;
+  };
+
+  # Add a masteruser for seamless nextcloud
+  services.dovecot2.settings = {
+    auth_master_user_separator = "*";
+    "passdb dovecot-masteruser" = {
+      driver = "passwd-file";
+      passwd_file_path = config.age.secrets.dovecot-masteruser.path;
+      result_success = "continue";
+      master = "yes";
+    };
+  };
+
+
 
   email-autoconfig = {
     enable = true;

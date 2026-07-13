@@ -18,7 +18,7 @@
     ./wireguard-server.nix
     ./mailserver.nix
     ./fail2ban.nix
-    ./immich-reverse-proxy.nix
+    # ./immich-reverse-proxy.nix
   ];
 
   boot = {

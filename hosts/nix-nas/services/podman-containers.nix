@@ -27,8 +27,8 @@
     roboto-serif
   ];
 
-  virtualisation.oci-containers.containers.onlyoffice = {
-    image = "onlyoffice/documentserver";
+  virtualisation.oci-containers.containers.euro-office = {
+    image = "ghcr.io/euro-office/documentserver:latest";
     ports = [ "7979:80" ];
     environmentFiles = [
       config.age.secrets.onlyoffice-docker-jwt.path

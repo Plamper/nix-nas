@@ -23,7 +23,7 @@
     ./services/nextcloud.nix
     ./services/jellyfin.nix
     ./services/arr.nix
-    ./services/immich.nix
+    # ./services/immich.nix
     # ./services/monitoring.nix
     ./services/podman-containers.nix
     ./services/reverse-proxy.nix

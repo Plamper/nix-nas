@@ -105,7 +105,6 @@
               tasks
               # previewgenerator
               notes
-              onlyoffice
               # needs to be configured in web-ui
               user_oidc
               mail
@@ -155,7 +154,7 @@
         };
 
         environment.systemPackages = [
-          pkgs.nodejs
+          pkgs.nodejs_22
           pkgs.jellyfin-ffmpeg
           pkgs.ghostscript
           pkgs.exiftool

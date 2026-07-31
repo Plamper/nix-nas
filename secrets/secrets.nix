@@ -36,4 +36,13 @@ in
   "noreply-smtp-password.age".publicKeys = keys;
   "dovecot-masterpassword.age".publicKeys = keys;
   "vaultwarden.env.age".publicKeys = keys;
+  "kanidm-admin-password.age".publicKeys = keys;
+  "kanidm-idm-admin-password.age".publicKeys = keys;
+  "kanidm-mail-sender-config.age".publicKeys = keys;
+  "kanidm-nextcloud-oidc-secret.age".publicKeys = keys;
+  "kanidm-mail-ldap.age".publicKeys = keys;
+  "kanidm-headscale-oidc-secret.age".publicKeys = keys;
+  "kanidm-headplane-oidc-secret.age".publicKeys = keys;
+  "headscale-api-key.age".publicKeys = keys;
+  "headplane-cookie-secret.age".publicKeys = keys;
 }

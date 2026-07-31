@@ -18,6 +18,7 @@
     ./wireguard-server.nix
     ./mailserver.nix
     ./fail2ban.nix
+    ./headscale.nix
     # ./immich-reverse-proxy.nix
   ];
 

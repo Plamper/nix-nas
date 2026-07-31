@@ -23,6 +23,12 @@ in
       group = "root";
       mode = "0600";
     };
+    kanidm-mail-ldap = {
+      file = ../../secrets/kanidm-mail-ldap.age;
+      owner = "root";
+      group = "root";
+      mode = "0600";
+    };
     dovecot-masteruser = {
       file = ../../secrets/dovecot-masterpassword.age;
       owner = "dovecot2";
@@ -93,30 +99,22 @@ in
 
     ldap = {
       enable = true;
-
-      uris = [ "ldap://10.20.0.2:3890" ];
-      base = "ou=people,dc=plamper,dc=org";
-
+      uris = [ "ldaps://idm.plamper.org:636" ];
+      base = "dc=idm,dc=plamper,dc=org";
       bind = {
-        dn = "uid=admin,ou=people,dc=plamper,dc=org";
-        passwordFile = config.age.secrets.lldap_pass.path;
+        dn = "dn=token";
+        passwordFile = config.age.secrets.kanidm-mail-ldap.path;
       };
-
       attributes = {
         uuid = "uuid";
-        mail = "mailboxAddress";
-        username = "mailboxAddress";
-      };
-
-      dovecot = {
-        passFilter = "(&(objectClass=person)(mailboxAddress=%{user}))";
-        userFilter = "(&(objectClass=person)(mailboxAddress=%{user}))";
-      };
-
-      postfix = {
-        filter = "(&(objectClass=person)(mailboxAddress=%s))";
+        mail = "mail";
+        username = "mail";
       };
     };
+  };
+
+  networking.hosts = {
+    "10.20.0.2" = [ "idm.plamper.org" ];
   };
 
   # OCI email delivery

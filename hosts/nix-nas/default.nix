@@ -34,6 +34,7 @@
     ./services/postgres.nix
     ./services/auth.nix
     ./services/forgejo.nix
+    ./services/kanidm.nix
   ];
   nixpkgs = {
     # You can add overlays here
@@ -113,7 +114,7 @@
       ];
     };
   };
-  networking.firewall.trustedInterfaces = [ "wg0" ];
+  networking.firewall.trustedInterfaces = [ "wg0" "tailscale0" ];
 
   # Discord Bot
   services.dynamic-channels-bot = {

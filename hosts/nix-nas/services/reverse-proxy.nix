@@ -31,7 +31,7 @@
         };
       };
 
-      "jellyfin.bodenlos-schlem.men" = {
+      "jellyfin.plamper.org" = {
         enableACME = true;
         acmeRoot = null;
         forceSSL = true;

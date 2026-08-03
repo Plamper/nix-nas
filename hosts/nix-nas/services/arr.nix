@@ -7,11 +7,10 @@
 }:
 {
 
-  services.nginx.virtualHosts."transmission.bodenlos-schlem.men" = {
+  services.nginx.virtualHosts."transmission.plamper.org" = {
     enableACME = true;
     acmeRoot = null;
     forceSSL = true;
-    enableAuthelia = true;
 
     locations."/" = {
       proxyPass = "http://192.168.100.15:9091";
@@ -20,15 +19,20 @@
       '';
     };
   };
-  services.nginx.virtualHosts."sonarr.bodenlos-schlem.men" = {
+  services.oauth2-proxy.nginx.virtualHosts."transmission.plamper.org" = {
+    allowed_groups = [ "arr_users@idm.plamper.org" ];
+  };
+  services.nginx.virtualHosts."sonarr.plamper.org" = {
     enableACME = true;
     acmeRoot = null;
     forceSSL = true;
-    enableAuthelia = true;
 
     locations."/" = {
       proxyPass = "http://192.168.100.15:8989/";
     };
+  };
+  services.oauth2-proxy.nginx.virtualHosts."sonarr.plamper.org" = {
+    allowed_groups = [ "arr_users@idm.plamper.org" ];
   };
 
   containers.arr =

@@ -30,9 +30,9 @@
     ./services/users.nix
     ./services/samba.nix
     ./services/email.nix
-    ./services/blocky.nix
+    # ./services/blocky.nix
     ./services/postgres.nix
-    ./services/auth.nix
+    # ./services/auth.nix
     ./services/forgejo.nix
     ./services/kanidm.nix
   ];
@@ -83,6 +83,7 @@
   services.tailscale = {
     enable = true;
     openFirewall = true;
+    useRoutingFeatures = "server";
   };
 
   networking.wireguard.enable = true;
@@ -114,7 +115,10 @@
       ];
     };
   };
-  networking.firewall.trustedInterfaces = [ "wg0" "tailscale0" ];
+  networking.firewall.trustedInterfaces = [
+    "wg0"
+    config.services.tailscale.interfaceName
+  ];
 
   # Discord Bot
   services.dynamic-channels-bot = {

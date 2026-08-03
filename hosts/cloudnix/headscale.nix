@@ -47,6 +47,31 @@ in
             type = "A";
             value = "100.64.0.3";
           }
+          {
+            name = "cloud.plamper.org";
+            type = "A";
+            value = "100.64.0.3";
+          }
+          {
+            name = "idm.plamper.org";
+            type = "A";
+            value = "100.64.0.3";
+          }
+          {
+            name = "sonarr.plamper.org";
+            type = "A";
+            value = "100.64.0.3";
+          }
+          {
+            name = "transmission.plamper.org";
+            type = "A";
+            value = "100.64.0.3";
+          }
+          {
+            name = "auth.plamper.org";
+            type = "A";
+            value = "100.64.0.3";
+          }
         ];
       };
 

@@ -45,4 +45,7 @@ in
   "kanidm-headplane-oidc-secret.age".publicKeys = keys;
   "headscale-api-key.age".publicKeys = keys;
   "headplane-cookie-secret.age".publicKeys = keys;
+  "kanidm-oauth2-proxy-oidc-secret.age".publicKeys = keys;
+  "oauth2-proxy-oidc-secret.age".publicKeys = keys;
+  "oauth2-proxy-cookie-secret.age".publicKeys = keys;
 }

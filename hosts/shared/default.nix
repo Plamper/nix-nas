@@ -8,7 +8,6 @@
 }:
 {
 
-  imports = [ ./authelia-nginx.nix ];
 
   # Stuff thats should be present on all hosts
 
@@ -34,7 +33,7 @@
     dnsResolver = "1.1.1.1:53";
     dnsProvider = "cloudflare";
     environmentFile = config.age.secrets."cloudflare-token".path;
-    extraLegoFlags = [ "--dns.propagation-wait=15s" ]; # Dns Propagation check does not work
+    extraLegoFlags = [ "--dns.propagation-wait=120s" ]; # Dns Propagation check does not work
   };
 
   # All servers have default nginx set
@@ -45,7 +44,7 @@
     recommendedTlsSettings = true;
     enable = true;
   };
-  # Open nginx firewall Ports 
+  # Open nginx firewall Ports
   networking.firewall.allowedTCPPorts = [ 80 443 ];
 
   nix =

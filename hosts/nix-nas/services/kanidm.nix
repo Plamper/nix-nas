@@ -35,6 +35,19 @@
     group = "kanidm";
     mode = "440";
   };
+  age.secrets."kanidm-oauth2-proxy-oidc-secret" = {
+    file = ../../../secrets/kanidm-oauth2-proxy-oidc-secret.age;
+    group = "kanidm";
+    mode = "440";
+  };
+  age.secrets."oauth2-proxy-oidc-secret" = {
+    file = ../../../secrets/oauth2-proxy-oidc-secret.age;
+    owner = "oauth2-proxy";
+  };
+  age.secrets."oauth2-proxy-cookie-secret" = {
+    file = ../../../secrets/oauth2-proxy-cookie-secret.age;
+    owner = "oauth2-proxy";
+  };
 
   services.kanidm.package = pkgs.kanidmWithSecretProvisioning_1_10;
   services.kanidm.server = {
@@ -73,6 +86,9 @@
       "nextcloud_users".overwriteMembers = false;
       "vpn_users".overwriteMembers = false;
       "vpn_admins".overwriteMembers = false;
+      "forward_auth_users".overwriteMembers = false;
+      "arr_users".overwriteMembers = false;
+      "jellyfin_users".overwriteMembers = false;
     };
     systems.oauth2 = {
       "nextcloud" = {
@@ -115,6 +131,20 @@
           "email"
         ];
       };
+      "oauth2-proxy" = {
+        displayName = "OAuth2 Proxy (Forward Auth)";
+        originUrl = "https://auth.plamper.org/oauth2/callback";
+        originLanding = "https://auth.plamper.org/";
+        basicSecretFile = config.age.secrets."kanidm-oauth2-proxy-oidc-secret".path;
+        scopeMaps = {
+          "forward_auth_users" = [
+            "openid"
+            "profile"
+            "email"
+            "groups"
+          ];
+        };
+      };
     };
   };
 
@@ -138,6 +168,40 @@
       RestartSec = "10s";
     };
   };
+
+  services.oauth2-proxy = {
+    enable = true;
+    provider = "oidc";
+    oidcIssuerUrl = "https://idm.plamper.org/oauth2/openid/oauth2-proxy";
+    clientID = "oauth2-proxy";
+    keyFile = config.age.secrets."oauth2-proxy-oidc-secret".path;
+
+    cookie.domain = ".plamper.org";
+    cookie.secretFile = config.age.secrets."oauth2-proxy-cookie-secret".path;
+
+    email.domains = [ "*" ];
+    setXauthrequest = true;
+    reverseProxy = true;
+    trustedProxyIP = [
+      "127.0.0.1/32"
+      "::1/128"
+    ];
+    httpAddress = "127.0.0.1:4180";
+    redirectURL = "https://auth.plamper.org/oauth2/callback";
+    nginx = {
+      domain = "auth.plamper.org";
+      proxy = "http://127.0.0.1:4180";
+    };
+
+    extraConfig = {
+      scope = "openid email profile groups";
+      oidc-groups-claim = "groups";
+      skip-provider-button = "true";
+      whitelist-domain = ".plamper.org";
+      code-challenge-method = "S256";
+    };
+  };
+
   services.nginx.virtualHosts."idm.plamper.org" = {
     enableACME = true;
     forceSSL = true;
@@ -148,5 +212,15 @@
         proxy_ssl_server_name on;
       '';
     };
+  };
+  services.nginx.virtualHosts."auth.plamper.org" = {
+    forceSSL = true;
+    enableACME = true;
+    acmeRoot = null;
+    extraConfig = ''
+      proxy_buffer_size   16k;
+      proxy_buffers       4 16k;
+      proxy_busy_buffers_size 16k;
+    '';
   };
 }

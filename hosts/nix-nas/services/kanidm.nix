@@ -217,7 +217,7 @@
     forceSSL = true;
     acmeRoot = null;
     locations."/" = {
-      proxyPass = "https://localhost:8443";
+      proxyPass = "https://127.0.0.1:8443";
       extraConfig = ''
         proxy_ssl_server_name on;
       '';

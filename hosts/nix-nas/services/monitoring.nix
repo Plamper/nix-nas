@@ -39,7 +39,10 @@
 
   services.prometheus.exporters.smartctl.enable = true;
 
-  networking.firewall.interfaces.wg0.allowedTCPPorts = [ 9633 ];
+  networking.firewall.interfaces.wg0.allowedTCPPorts = [
+    3030
+    9633
+  ];
 
   services.prometheus = {
     enable = true;

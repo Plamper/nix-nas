@@ -69,6 +69,37 @@
     ];
   };
 
+  # Collect systemd journal logs from every host and send them to the Loki instance
+  # on nix-nas over the homelab VPN.
+  services.alloy.enable = true;
+  environment.etc."alloy/config.alloy".text = ''
+    loki.write "default" {
+      endpoint {
+        url = "http://${
+          if config.networking.hostName == "nix-nas" then "127.0.0.1" else "10.20.0.2"
+        }:3030/loki/api/v1/push"
+      }
+    }
+
+    loki.relabel "journal" {
+      forward_to = []
+      rule {
+        source_labels = ["__journal__systemd_unit"]
+        target_label  = "unit"
+      }
+    }
+
+    loki.source.journal "journal" {
+      max_age       = "12h"
+      relabel_rules = loki.relabel.journal.rules
+      labels = {
+        job  = "systemd-journal",
+        host = "${config.networking.hostName}",
+      }
+      forward_to = [loki.write.default.receiver]
+    }
+  '';
+
   nix =
     let
       flakeInputs = lib.filterAttrs (_: lib.isType "flake") inputs;

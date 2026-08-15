@@ -49,7 +49,7 @@
     owner = "oauth2-proxy";
   };
 
-  services.kanidm.package = pkgs.kanidmWithSecretProvisioning_1_10;
+  services.kanidm.package = pkgs.kanidmWithSecretProvisioning_1_11;
   services.kanidm.server = {
     enable = true;
     settings = {
@@ -154,7 +154,10 @@
       "kanidm.service"
       "network-online.target"
     ];
-    wants = [ "network-online.target" ];
+    wants = [
+      "network-online.target"
+      "kanidm.service"
+    ];
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
@@ -167,6 +170,13 @@
       Restart = "on-failure";
       RestartSec = "10s";
     };
+  };
+
+  # wait for kanidm before starting oauth2-proxy
+  systemd.services.oauth2-proxy = {
+    after = [ "kanidm.service" ];
+    wants = [ "kanidm.service" ];
+    serviceConfig.RestartSec = "10s";
   };
 
   services.oauth2-proxy = {

@@ -72,6 +72,11 @@ in
             type = "A";
             value = "100.64.0.3";
           }
+          {
+            name = "grafana.plamper.org";
+            type = "A";
+            value = "100.64.0.3";
+          }
         ];
       };
 

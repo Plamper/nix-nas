@@ -71,7 +71,6 @@ in
     };
     enableManageSieve = true;
 
-
     mailboxes = {
       Drafts = {
         auto = "subscribe";
@@ -117,6 +116,10 @@ in
     "10.20.0.2" = [ "idm.plamper.org" ];
   };
 
+  services.prometheus.exporters.postfix.enable = true;
+
+  networking.firewall.interfaces.wg0.allowedTCPPorts = [ 9154 ];
+
   # OCI email delivery
   services.postfix.settings.main = {
     relayhost = [ "[${ociSmtp}]:587" ];
@@ -150,8 +153,6 @@ in
       master = "yes";
     };
   };
-
-
 
   email-autoconfig = {
     enable = true;

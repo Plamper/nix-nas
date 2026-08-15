@@ -1,11 +1,11 @@
-{ config, pkgs, ... }:
+{ config, ... }:
 {
-  # grafana configuration
   services.grafana = {
     enable = true;
+    settings.security.secret_key = "SW2YcwTIb9zpOOhoPsMm";
     settings.server = {
-      domain = "grafana.bodenlos-schlem.men";
-      http_port = 2342;
+      domain = "grafana.plamper.org";
+      http_port = 3000;
       http_addr = "127.0.0.1";
     };
     provision = {
@@ -27,31 +27,74 @@
     };
   };
 
+  services.nginx.virtualHosts.${config.services.grafana.settings.server.domain} = {
+    enableACME = true;
+    acmeRoot = null;
+    forceSSL = true;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}";
+      proxyWebsockets = true;
+    };
+  };
+
+  services.prometheus.exporters.smartctl.enable = true;
+
+  networking.firewall.interfaces.wg0.allowedTCPPorts = [ 9633 ];
+
   services.prometheus = {
     enable = true;
     port = 9001;
     scrapeConfigs = [
       {
-        job_name = "node";
-        static_configs = [{
-          targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.node.port}" ];
-        }];
+        job_name = "node-nix-nas";
+        static_configs = [
+          {
+            targets = [ "127.0.0.1:9100" ];
+            labels.host = "nix-nas";
+          }
+        ];
       }
       {
-        job_name = "nextcloud";
-        static_configs = [{
-          targets = [ "192.168.100.11:9003" ];
-        }];
+        job_name = "node-cloudnix";
+        static_configs = [
+          {
+            targets = [ "10.20.0.1:9100" ];
+            labels.host = "cloudnix";
+          }
+        ];
+      }
+      {
+        job_name = "nginx";
+        static_configs = [
+          {
+            targets = [ "10.20.0.2:9113" ];
+            labels.host = "nix-nas";
+          }
+          {
+            targets = [ "10.20.0.1:9113" ];
+            labels.host = "cloudnix";
+          }
+        ];
+      }
+      {
+        job_name = "postfix";
+        static_configs = [
+          {
+            targets = [ "10.20.0.1:9154" ];
+            labels.host = "cloudnix";
+          }
+        ];
+      }
+      {
+        job_name = "smartctl";
+        static_configs = [
+          {
+            targets = [ "10.20.0.2:9633" ];
+            labels.host = "nix-nas";
+          }
+        ];
       }
     ];
-
-    exporters = {
-      node = {
-        enable = true;
-        enabledCollectors = [ "systemd" "processes" ];
-        port = 9002;
-      };
-    };
   };
 
   # loki: port 3030 (8030)
@@ -74,16 +117,18 @@
       };
 
       schema_config = {
-        configs = [{
-          from = "2020-10-24";
-          store = "tsdb";
-          object_store = "filesystem";
-          schema = "v13";
-          index = {
-            prefix = "index_";
-            period = "24h";
-          };
-        }];
+        configs = [
+          {
+            from = "2020-10-24";
+            store = "tsdb";
+            object_store = "filesystem";
+            schema = "v13";
+            index = {
+              prefix = "index_";
+              period = "24h";
+            };
+          }
+        ];
       };
     };
     # user, group, dataDir, extraFlags, (configFile)

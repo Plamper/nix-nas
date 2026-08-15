@@ -8,7 +8,6 @@
 }:
 {
 
-
   # Stuff thats should be present on all hosts
 
   environment.systemPackages = (
@@ -42,10 +41,33 @@
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
     recommendedTlsSettings = true;
+    statusPage = true;
     enable = true;
   };
   # Open nginx firewall Ports
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
+  networking.firewall.allowedTCPPorts = [
+    80
+    443
+  ];
+
+  services.prometheus.exporters.nginx = {
+    enable = true;
+    scrapeUri = "http://127.0.0.1/nginx_status";
+  };
+
+  networking.firewall.interfaces.wg0.allowedTCPPorts = [
+    9113
+    9100
+  ];
+
+  # Expose host-level metrics to the monitoring server over the homelab VPN.
+  services.prometheus.exporters.node = {
+    enable = true;
+    enabledCollectors = [
+      "systemd"
+      "processes"
+    ];
+  };
 
   nix =
     let

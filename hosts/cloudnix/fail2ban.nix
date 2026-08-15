@@ -20,6 +20,14 @@
         enabled = true; # covers IMAP brute force
         maxretry = 5;
       };
+      postfix.settings = {
+        enabled = true; # covers rejected SMTP requests
+        maxretry = 5;
+      };
+      postfix-sasl.settings = {
+        enabled = true; # covers SMTP authentication brute force
+        maxretry = 5;
+      };
     };
   };
 }

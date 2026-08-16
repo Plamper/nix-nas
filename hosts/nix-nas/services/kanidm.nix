@@ -40,6 +40,11 @@
     group = "kanidm";
     mode = "440";
   };
+  age.secrets."kanidm-vaultwarden-oidc-secret" = {
+    file = ../../../secrets/kanidm-vaultwarden-oidc-secret.age;
+    group = "kanidm";
+    mode = "440";
+  };
   age.secrets."oauth2-proxy-oidc-secret" = {
     file = ../../../secrets/oauth2-proxy-oidc-secret.age;
     owner = "oauth2-proxy";
@@ -142,6 +147,20 @@
             "profile"
             "email"
             "groups"
+          ];
+        };
+      };
+      "vaultwarden" = {
+        displayName = "Vaultwarden";
+        originUrl = "https://pass.plamper.org/identity/connect/oidc-signin";
+        originLanding = "https://pass.plamper.org/";
+        basicSecretFile = config.age.secrets."kanidm-vaultwarden-oidc-secret".path;
+        preferShortUsername = true;
+        scopeMaps = {
+          "nextcloud_users" = [
+            "openid"
+            "profile"
+            "email"
           ];
         };
       };

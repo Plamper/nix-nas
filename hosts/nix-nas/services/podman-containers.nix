@@ -2,19 +2,17 @@
 {
 
   virtualisation.oci-containers.containers.muse = {
-    image = "docker.io/dovah/muse";
+    image = "ghcr.io/museofficial/muse";
     volumes = [
       "/var/muse:/data"
     ];
     environmentFiles = [
       config.age.secrets.muse-env.path
     ];
+    labels."io.containers.autoupdate" = "registry";
   };
 
   systemd.tmpfiles.rules = [
-    "d /var/homarr/configs 0770 root root -"
-    "d /var/homarr/data 0770 root root -"
-    "d /var/homarr/icons 0770 root root -"
     "d /var/muse 0770 root root -"
   ];
 
@@ -33,6 +31,7 @@
     environmentFiles = [
       config.age.secrets.onlyoffice-docker-jwt.path
     ];
+    labels."io.containers.autoupdate" = "registry";
     volumes =
       let
         noto-cjk-serif = pkgs.fetchzip {
@@ -57,38 +56,20 @@
       ];
   };
 
-  # from https://discourse.nixos.org/t/updating-oci-container-images/30029/4
-  environment.systemPackages = [
-    (pkgs.writeShellScriptBin "update-containers" ''
-      	SUDO=""
-      	if [[ $(id -u) -ne 0 ]]; then
-      		SUDO="sudo"
-      	fi
-
-          images=$($SUDO ${pkgs.podman}/bin/podman ps -a --format="{{.Image}}" | sort -u)
-
-          for image in $images
-          do
-            $SUDO ${pkgs.podman}/bin/podman pull $image
-          done
-    '')
-  ];
-  systemd.timers = {
-    updatecontainers = {
-      timerConfig = {
-        Unit = "updatecontainers.service";
-        OnCalendar = "Mon 02:00";
-      };
-      wantedBy = [ "timers.target" ];
+  systemd.services.podman-auto-update = {
+    description = "Podman auto-update";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.podman}/bin/podman auto-update";
     };
   };
 
-  systemd.services = {
-    updatecontainers = {
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = "update-containers";
-      };
+  systemd.timers.podman-auto-update = {
+    description = "Podman auto-update timer";
+    timerConfig = {
+      OnCalendar = "Mon 02:00";
+      Persistent = true;
     };
+    wantedBy = [ "timers.target" ];
   };
 }

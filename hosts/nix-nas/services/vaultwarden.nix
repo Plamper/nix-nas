@@ -22,11 +22,12 @@
 
   services.vaultwarden = {
     enable = true;
-    backupDir = "/var/local/vaultwarden/backup";
     environmentFile = [
       config.age.secrets."vaultwarden-oidc-secret".path
       config.age.secrets."vaultwarden-smtp-secret".path
     ];
+    configurePostgres = true;
+    dbBackend = "postgresql";
     config = {
       # Refer to https://github.com/dani-garcia/vaultwarden/blob/main/.env.template
       DOMAIN = "https://pass.plamper.org";
@@ -39,16 +40,25 @@
 
       ROCKET_ADDRESS = "127.0.0.1";
       ROCKET_PORT = 8222;
-      ROCKET_LOG = "debug";
-      SSO_DEBUG_TOKENS = true;
 
       SMTP_HOST = "mail.plamper.org";
       SMTP_PORT = 465;
-      SMTP_SSL = true;
+      SMTP_SECURITY="force_tls";
 
       SMTP_USERNAME = "noreply@plamper.org";
       SMTP_FROM = "noreply@plamper.org";
       SMTP_FROM_NAME = "Plamper.org Vaultwarden";
     };
   };
+
+  services.postgresqlBackup = {
+    enable = true;
+    databases = [ "vaultwarden" ];
+    location = "/mnt/data-pool/Backups/vaultwarden";
+    startAt = "*-*-* 01:15:00";
+  };
+
+  systemd.tmpfiles.rules = [
+    "d /mnt/data-pool/Backups/vaultwarden 0700 postgres postgres -"
+  ];
 }

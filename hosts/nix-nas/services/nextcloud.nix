@@ -7,6 +7,10 @@
 }:
 {
 
+  systemd.tmpfiles.rules = [
+    "d /mnt/data-pool/Backups/nextcloud 0700 postgres postgres -"
+  ];
+
   containers.nextcloud = {
     autoStart = true;
     privateNetwork = true;
@@ -16,6 +20,10 @@
     bindMounts = {
       "/Nextcloud" = {
         hostPath = "/mnt/data-pool/nextcloud";
+        isReadOnly = false;
+      };
+      "/mnt/data-pool/Backups/nextcloud" = {
+        hostPath = "/mnt/data-pool/Backups/nextcloud";
         isReadOnly = false;
       };
     };
@@ -262,6 +270,17 @@
                superuser_map      /^(.*)$   \1
           '';
         };
+
+        services.postgresqlBackup = {
+          enable = true;
+          databases = [ "nextcloud" ];
+          location = "/mnt/data-pool/Backups/nextcloud";
+          startAt = "*-*-* 01:15:00";
+        };
+
+        systemd.tmpfiles.rules = [
+          "d /mnt/data-pool/Backups/nextcloud 0700 postgres postgres -"
+        ];
 
         services.prometheus.exporters.nextcloud = {
           enable = true;

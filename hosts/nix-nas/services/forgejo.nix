@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 let
   cfg = config.services.forgejo;
   srv = cfg.settings.server;
@@ -27,11 +32,27 @@ in
         DOMAIN = "git.plamper.org";
         # You need to specify this to remove the port from URLs in the web UI.
         ROOT_URL = "https://${srv.DOMAIN}/";
-        HTTP_PORT = 3000;
+        HTTP_PORT = 3221;
         # SSH_PORT = lib.head config.services.openssh.ports;
       };
       # You can temporarily allow registration to create an admin user.
-      service.DISABLE_REGISTRATION = true;
+      service = {
+        DISABLE_REGISTRATION = true;
+        ENABLE_PASSWORD_SIGNIN = false;
+        ENABLE_INTERNAL_SIGNIN = false;
+        ENABLE_BASIC_AUTHENTICATION = false;
+        ALLOW_ONLY_EXTERNAL_REGISTRATION = true;
+      };
+
+      quota.ENABLED = true;
+      "quota.default".TOTAL = "100M";
+
+      openid.ENABLE_OPENID_SIGNUP = true;
+      oauth2_client = {
+        ENABLE_AUTO_REGISTRATION = true;
+        ACCOUNT_LINKING = "disabled";
+        UPDATE_AVATAR = true;
+      };
       # Add support for actions, based on act: https://github.com/nektos/act
       actions = {
         ENABLED = true;

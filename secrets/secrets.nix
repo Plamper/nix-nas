@@ -47,6 +47,7 @@ in
   "headplane-cookie-secret.age".publicKeys = keys;
   "kanidm-oauth2-proxy-oidc-secret.age".publicKeys = keys;
   "kanidm-vaultwarden-oidc-secret.age".publicKeys = keys;
+  "kanidm-forgejo-oidc-secret.age".publicKeys = keys;
   "vaultwarden-oidc-secret.age".publicKeys = keys;
   "vaultwarden-smtp-secret.age".publicKeys = keys;
   "oauth2-proxy-oidc-secret.age".publicKeys = keys;

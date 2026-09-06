@@ -45,6 +45,11 @@
     group = "kanidm";
     mode = "440";
   };
+  age.secrets."kanidm-forgejo-oidc-secret" = {
+    file = ../../../secrets/kanidm-forgejo-oidc-secret.age;
+    group = "kanidm";
+    mode = "440";
+  };
   age.secrets."oauth2-proxy-oidc-secret" = {
     file = ../../../secrets/oauth2-proxy-oidc-secret.age;
     owner = "oauth2-proxy";
@@ -94,6 +99,8 @@
       "forward_auth_users".overwriteMembers = false;
       "arr_users".overwriteMembers = false;
       "jellyfin_users".overwriteMembers = false;
+      "git_users".overwriteMembers = false;
+      "git_admins".overwriteMembers = false;
     };
     systems.oauth2 = {
       "nextcloud" = {
@@ -161,6 +168,29 @@
             "openid"
             "profile"
             "email"
+          ];
+        };
+      };
+      "forgejo" = {
+        displayName = "Forgejo";
+        originUrl = "https://git.plamper.org/user/oauth2/Kanidm/callback";
+        originLanding = "https://git.plamper.org/";
+        basicSecretFile = config.age.secrets."kanidm-forgejo-oidc-secret".path;
+        preferShortUsername = true;
+        scopeMaps = {
+          "git_users" = [
+            "openid"
+            "profile"
+            "email"
+            "groups"
+            "ssh_publickeys"
+          ];
+          "git_admins" = [
+            "openid"
+            "profile"
+            "email"
+            "groups"
+            "ssh_publickeys"
           ];
         };
       };

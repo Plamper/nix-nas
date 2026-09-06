@@ -60,8 +60,7 @@ in
     enableImap = true;
     enableSubmission = true;
 
-    # OCI does this
-    dkim.enable = false;
+    dkim.enable = true;
 
     fullTextSearch = {
       enable = true;

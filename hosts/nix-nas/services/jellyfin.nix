@@ -1,10 +1,14 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 {
 
   # GUC for hw dec
-  boot.kernelParams = [ "i915.enable_guc=3" "i915.enable_fbc=1" ];
+  boot.kernelParams = [
+    "i915.enable_guc=3"
+    "i915.enable_fbc=1"
+  ];
 
   containers.jellyfin = {
+    nixpkgs = inputs.nixpkgs-unstable;
     autoStart = true;
     privateNetwork = true;
     # forwardPorts = [{
@@ -40,72 +44,73 @@
       }
     ];
 
+    config =
+      {
+        config,
+        pkgs,
+        lib,
+        ...
+      }:
+      {
 
-    config = { config, pkgs, lib, ... }: {
+        nixpkgs.hostPlatform = lib.mkForce "x86_64-linux";
 
-      # intro skipper fix
-      nixpkgs.overlays = with pkgs; [
-        # https://github.com/NixOS/nixpkgs/issues/303074
-        # May no longer be necessary with next nixos version
-        (final: prev: {
-          jellyfin-ffmpeg = prev.jellyfin-ffmpeg.override {
-            ffmpeg_7-full = prev.ffmpeg_7-full.override {
-              withMfx = false;
-              withVpl = true;
-            };
-          };
-        })
-        (final: prev: {
-          intel-vaapi-driver = prev.intel-vaapi-driver.override { enableHybridCodec = true; };
-        })
-      ];
-
-      hardware.graphics = {
-        enable = true;
-        extraPackages = with pkgs; [
-          intel-media-driver
-          intel-vaapi-driver # previously vaapiIntel
-          libva-vdpau-driver
-          intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
-          vpl-gpu-rt # QSV on 11th gen or newer
-          # intel-media-sdk # QSV up to 11th gen
+        nixpkgs.overlays = [
+          (final: prev: {
+            intel-vaapi-driver = prev.intel-vaapi-driver.override { enableHybridCodec = true; };
+          })
         ];
-      };
-      environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
 
-
-      users.groups.media.gid = 555;
-
-      services.jellyfin = {
-        enable = true;
-        openFirewall = true;
-        group = "media";
-      };
-      environment.systemPackages = [
-        pkgs.jellyfin
-        pkgs.jellyfin-web
-        pkgs.jellyfin-ffmpeg
-        pkgs.libva-utils
-      ];
-
-      users.users.jellyfin.extraGroups = [ "render" "video" ];
-
-      system.stateVersion = "24.05";
-
-      networking = {
-        firewall = {
+        hardware.graphics = {
           enable = true;
-          # allowedTCPPorts = [ 8096 ];
+          extraPackages = with pkgs; [
+            intel-media-driver
+            intel-vaapi-driver # previously vaapiIntel
+            libva-vdpau-driver
+            intel-compute-runtime # OpenCL filter support (hardware tonemapping and subtitle burn-in)
+            vpl-gpu-rt # QSV on 11th gen or newer
+            # intel-media-sdk # QSV up to 11th gen
+          ];
         };
-        # Use systemd-resolved inside the container
-        # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
-        useHostResolvConf = lib.mkForce false;
+        environment.sessionVariables = {
+          LIBVA_DRIVER_NAME = "iHD";
+        };
+
+        users.groups.media.gid = 555;
+
+        services.jellyfin = {
+          enable = true;
+          openFirewall = true;
+          group = "media";
+        };
+        environment.systemPackages = [
+          pkgs.jellyfin
+          pkgs.jellyfin-web
+          pkgs.jellyfin-ffmpeg
+          pkgs.libva-utils
+        ];
+
+        users.users.jellyfin.extraGroups = [
+          "render"
+          "video"
+        ];
+
+        system.stateVersion = "24.05";
+
+        networking = {
+          firewall = {
+            enable = true;
+            # allowedTCPPorts = [ 8096 ];
+          };
+          # Use systemd-resolved inside the container
+          # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
+          useHostResolvConf = lib.mkForce false;
+        };
+
+        services.resolved.enable = true;
+
+        time.timeZone = lib.mkDefault "Europe/Berlin";
+
       };
-
-      services.resolved.enable = true;
-
-      time.timeZone = lib.mkDefault "Europe/Berlin";
-
-    };
   };
 }

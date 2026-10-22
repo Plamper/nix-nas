@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 let
   domain = "vpn.plamper.org";
 in
@@ -115,13 +120,15 @@ in
         base_url = "https://${domain}";
       };
 
-      headscale.url = "https://${domain}";
+      headscale = {
+        url = "https://${domain}";
+        api_key_path = config.age.secrets."headscale-api-key".path;
+      };
 
       oidc = {
         issuer = "https://idm.plamper.org/oauth2/openid/headplane";
         client_id = "headplane";
         client_secret_path = config.age.secrets."kanidm-headplane-oidc-secret".path;
-        headscale_api_key_path = config.age.secrets."headscale-api-key".path;
         token_endpoint_auth_method = "client_secret_post";
         use_pkce = true;
         disable_api_key_login = true;

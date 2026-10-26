@@ -112,12 +112,12 @@ in
   };
 
   networking.hosts = {
-    "10.20.0.2" = [ "idm.plamper.org" ];
+    "100.64.0.3" = [ "idm.plamper.org" ];
   };
 
   services.prometheus.exporters.postfix.enable = true;
 
-  networking.firewall.interfaces.wg0.allowedTCPPorts = [ 9154 ];
+  networking.firewall.interfaces.${config.services.tailscale.interfaceName}.allowedTCPPorts = [ 9154 ];
 
   # OCI email delivery
   services.postfix.settings.main = {
@@ -132,7 +132,7 @@ in
   # Borg backup for mail storage
   services.borgbackup.jobs.mail = {
     paths = [ config.mailserver.storage.path ];
-    repo = "ssh://borg@10.20.0.2/~/mail";
+    repo = "ssh://borg@100.64.0.3/~/mail";
     encryption.mode = "none";
     environment = {
       BORG_RSH = "ssh -i /var/vmail/.ssh/id_ed25519";

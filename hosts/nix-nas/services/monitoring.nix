@@ -39,7 +39,7 @@
 
   services.prometheus.exporters.smartctl.enable = true;
 
-  networking.firewall.interfaces.wg0.allowedTCPPorts = [
+  networking.firewall.interfaces.${config.services.tailscale.interfaceName}.allowedTCPPorts = [
     3030
     9633
   ];
@@ -61,8 +61,17 @@
         job_name = "node-cloudnix";
         static_configs = [
           {
-            targets = [ "10.20.0.1:9100" ];
+            targets = [ "100.64.0.4:9100" ];
             labels.host = "cloudnix";
+          }
+        ];
+      }
+      {
+        job_name = "node-vpnnix";
+        static_configs = [
+          {
+            targets = [ "100.64.0.9:9100" ];
+            labels.host = "vpnnix";
           }
         ];
       }
@@ -70,12 +79,16 @@
         job_name = "nginx";
         static_configs = [
           {
-            targets = [ "10.20.0.2:9113" ];
+            targets = [ "100.64.0.3:9113" ];
             labels.host = "nix-nas";
           }
           {
-            targets = [ "10.20.0.1:9113" ];
+            targets = [ "100.64.0.4:9113" ];
             labels.host = "cloudnix";
+          }
+          {
+            targets = [ "100.64.0.9:9113" ];
+            labels.host = "vpnnix";
           }
         ];
       }
@@ -83,7 +96,7 @@
         job_name = "postfix";
         static_configs = [
           {
-            targets = [ "10.20.0.1:9154" ];
+            targets = [ "100.64.0.4:9154" ];
             labels.host = "cloudnix";
           }
         ];
@@ -92,7 +105,7 @@
         job_name = "smartctl";
         static_configs = [
           {
-            targets = [ "10.20.0.2:9633" ];
+            targets = [ "100.64.0.3:9633" ];
             labels.host = "nix-nas";
           }
         ];

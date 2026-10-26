@@ -96,19 +96,7 @@
             agenix.nixosModules.default
           ];
         };
-      };
 
-      deploy.nodes.nix-nas = {
-        hostname = "nix-nas";
-        sshUser = "admin";
-        # remoteBuild = true;
-        profiles.system = {
-          user = "root";
-          path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.nix-nas;
-        };
-      };
-
-      nixosConfigurations = {
         cloudnix = nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit
@@ -124,15 +112,56 @@
             disko.nixosModules.disko
           ];
         };
+
+        vpnnix = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit
+              inputs
+              outputs
+              agenix
+              ;
+          };
+          system = "x86_64-linux";
+          modules = [
+            "${nixpkgs}/nixos/modules/virtualisation/oci-image.nix"
+            ./hosts/vpnnix
+            agenix.nixosModules.default
+          ];
+        };
       };
 
-      deploy.nodes.cloudnix = {
-        hostname = "150.230.147.99";
-        sshUser = "admin";
-        remoteBuild = true;
-        profiles.system = {
-          user = "root";
-          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.cloudnix;
+      packages.x86_64-linux.vpnnix-oci-image =
+        self.nixosConfigurations.vpnnix.config.system.build.OCIImage;
+
+      deploy.nodes = {
+        nix-nas = {
+          hostname = "nix-nas";
+          sshUser = "admin";
+          # remoteBuild = true;
+          profiles.system = {
+            user = "root";
+            path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.nix-nas;
+          };
+        };
+
+        cloudnix = {
+          hostname = "150.230.147.99";
+          sshUser = "admin";
+          remoteBuild = true;
+          profiles.system = {
+            user = "root";
+            path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.cloudnix;
+          };
+        };
+
+        vpnnix = {
+          hostname = "129.159.12.97";
+          sshUser = "admin";
+          remoteBuild = false;
+          profiles.system = {
+            user = "root";
+            path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.vpnnix;
+          };
         };
       };
     };

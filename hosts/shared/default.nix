@@ -55,7 +55,7 @@
     scrapeUri = "http://127.0.0.1/nginx_status";
   };
 
-  networking.firewall.interfaces.wg0.allowedTCPPorts = [
+  networking.firewall.interfaces.${config.services.tailscale.interfaceName}.allowedTCPPorts = [
     9113
     9100
   ];
@@ -76,7 +76,7 @@
     loki.write "default" {
       endpoint {
         url = "http://${
-          if config.networking.hostName == "nix-nas" then "127.0.0.1" else "10.20.0.2"
+          if config.networking.hostName == "nix-nas" then "127.0.0.1" else "100.64.0.3"
         }:3030/loki/api/v1/push"
       }
     }

@@ -157,7 +157,7 @@
         vpnnix = {
           hostname = "129.159.12.97";
           sshUser = "admin";
-          remoteBuild = false;
+          remoteBuild = true;
           profiles.system = {
             user = "root";
             path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.vpnnix;

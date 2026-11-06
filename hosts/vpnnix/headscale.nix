@@ -30,6 +30,9 @@ in
     port = 8081;
 
     settings = {
+
+      node.expiry = "180d";
+      
       server_url = "https://${domain}";
 
       dns = {

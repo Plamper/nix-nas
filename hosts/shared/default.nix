@@ -8,6 +8,10 @@
 }:
 {
 
+  imports = [
+    ./fail2ban.nix
+  ];
+
   # Stuff thats should be present on all hosts
 
   environment.systemPackages = (

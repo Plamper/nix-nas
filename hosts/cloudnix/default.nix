@@ -16,7 +16,6 @@
     ./disk-config.nix
 
     ./mailserver.nix
-    ./fail2ban.nix
     # ./immich-reverse-proxy.nix
   ];
 

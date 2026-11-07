@@ -87,7 +87,7 @@
 
         services.nextcloud = {
           enable = true;
-          package = pkgs.nextcloud34;
+          package = pkgs.nextcloud35;
           hostName = "cloud.plamper.org";
           https = false;
           configureRedis = true;
@@ -129,7 +129,7 @@
             mail_from_address = "noreply";
             mail_domain = "plamper.org";
             "memories.exiftool" = "${lib.getExe pkgs.exiftool}";
-            "memories.exiftool_no_local" = false;
+            # "memories.exiftool_no_local" = false;
             "memories.vod.ffmpeg" = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
             "memories.vod.ffprobe" = "${pkgs.jellyfin-ffmpeg}/bin/ffprobe";
             "memories.timeline.default_path" = "/Photos";
@@ -172,8 +172,14 @@
         systemd.services.nextcloud-cron = {
           path = [
             pkgs.exiftool
+            pkgs.perl
           ];
         };
+
+        systemd.services.phpfpm-nextcloud.path = [
+          pkgs.exiftool
+          pkgs.perl
+        ];
 
         systemd.services."nextcloud-setup" = {
           requires = [ "postgresql.service" ];
@@ -210,17 +216,17 @@
           (final: prev: {
             intel-vaapi-driver = prev.intel-vaapi-driver.override { enableHybridCodec = true; };
           })
-          (final: prev: {
-            exiftool = prev.exiftool.overrideAttrs (
-              f: p: {
-                version = "13.44";
-                src = pkgs.fetchurl {
-                  url = "https://github.com/exiftool/exiftool/archive/refs/tags/13.44.tar.gz";
-                  hash = "sha256-uiPgu1Cv+BWG8D3GBXvGDokp2o1hW1TLn6+T0EDMBRY=";
-                };
-              }
-            );
-          })
+          # (final: prev: {
+          #   exiftool = prev.exiftool.overrideAttrs (
+          #     f: p: {
+          #       version = "13.44";
+          #       src = pkgs.fetchurl {
+          #         url = "https://github.com/exiftool/exiftool/archive/refs/tags/13.44.tar.gz";
+          #         hash = "sha256-uiPgu1Cv+BWG8D3GBXvGDokp2o1hW1TLn6+T0EDMBRY=";
+          #       };
+          #     }
+          #   );
+          # })
         ];
 
         hardware.graphics = {

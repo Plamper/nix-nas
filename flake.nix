@@ -137,7 +137,7 @@
         nix-nas = {
           hostname = "nix-nas";
           sshUser = "admin";
-          # remoteBuild = true;
+          remoteBuild = true;
           profiles.system = {
             user = "root";
             path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.nix-nas;

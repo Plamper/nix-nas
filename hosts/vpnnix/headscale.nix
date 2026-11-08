@@ -90,6 +90,11 @@ in
             type = "A";
             value = "100.64.0.3";
           }
+          {
+            name = "headplane.plamper.org";
+            type = "A";
+            value = "100.64.0.9";
+          }
         ];
       };
 
@@ -115,7 +120,7 @@ in
         port = 3000;
         cookie_secret_path = config.age.secrets."headplane-cookie-secret".path;
         cookie_secure = true;
-        base_url = "https://${domain}";
+        base_url = "https://headplane.plamper.org";
       };
 
       headscale = {
@@ -144,7 +149,25 @@ in
         proxyWebsockets = true;
         recommendedProxySettings = true;
       };
-      "/admin/" = {
+    };
+  };
+
+  services.nginx.virtualHosts."headplane.plamper.org" = {
+    forceSSL = true;
+    enableACME = true;
+    acmeRoot = null;
+    extraConfig = ''
+      allow 100.64.0.0/10;
+      allow fd7a:115c:a1e0::/48;
+      allow 127.0.0.1;
+      allow ::1;
+      deny all;
+    '';
+    locations = {
+      "= /" = {
+        return = "302 /admin/";
+      };
+      "/" = {
         proxyPass = "http://127.0.0.1:3000";
         proxyWebsockets = true;
         recommendedProxySettings = true;

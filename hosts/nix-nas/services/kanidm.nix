@@ -133,8 +133,8 @@
       };
       "headplane" = {
         displayName = "Headplane";
-        originUrl = "https://vpn.plamper.org/admin/oidc/callback";
-        originLanding = "https://vpn.plamper.org/admin/";
+        originUrl = "https://headplane.plamper.org/admin/oidc/callback";
+        originLanding = "https://headplane.plamper.org/admin/";
         basicSecretFile = config.age.secrets."kanidm-headplane-oidc-secret".path;
         preferShortUsername = true;
         scopeMaps."vpn_admins" = [

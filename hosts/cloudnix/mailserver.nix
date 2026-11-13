@@ -8,7 +8,7 @@
 
 let
   domain = "plamper.org";
-  ociSmtp = "smtp.email.eu-frankfurt-1.oci.oraclecloud.com";
+  ociSmtp = "smtp.resend.com";
 in
 {
   imports = [
@@ -121,11 +121,12 @@ in
 
   # OCI email delivery
   services.postfix.settings.main = {
-    relayhost = [ "[${ociSmtp}]:587" ];
+    relayhost = [ "[${ociSmtp}]:465" ];
     smtp_sasl_auth_enable = "yes";
     smtp_sasl_security_options = "noanonymous";
     smtp_sasl_password_maps = "texthash:${config.age.secrets.smtp_pass.path}";
     smtp_tls_security_level = lib.mkForce "encrypt";
+    smtp_tls_wrappermode = "yes";
     smtp_tls_CAfile = lib.mkDefault "/etc/ssl/certs/ca-certificates.crt";
   };
 

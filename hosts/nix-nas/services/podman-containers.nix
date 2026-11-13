@@ -24,6 +24,12 @@
     group = "podman";
   };
 
+  age.secrets.typst-editor-invite-token = {
+    file = ../../../secrets/typst-editor-invite-token.age;
+    owner = "podman";
+    group = "podman";
+  };
+
   virtualisation.oci-containers.containers.muse = {
     image = "ghcr.io/museofficial/muse";
     podman.user = "podman";
@@ -123,6 +129,8 @@
       HOST = "0.0.0.0";
       PORT = "8978";
     };
+
+    environmentFiles = [ config.age.secrets.typst-editor-invite-token.path ];
 
     volumes = [
       "/mnt/data-pool/typst:/app/data:U"

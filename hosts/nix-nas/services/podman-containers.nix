@@ -141,27 +141,115 @@
       "--stop-timeout=15"
       "--log-opt=max-size=10m"
     ];
+
+    labels."io.containers.autoupdate" = "registry";
   };
 
-  systemd.services.podman-auto-update = {
-    description = "Podman auto-update";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.podman}/bin/podman auto-update";
-      User = "podman";
-      # Omit NoNewPrivileges/RestrictNamespaces/RestrictSUIDSGID for rootless newuidmap
-      ProtectHome = true;
-      ProtectKernelTunables = true;
-      ProtectKernelModules = true;
-      ProtectControlGroups = true;
-      PrivateDevices = true;
-      LockPersonality = true;
+  systemd.services.podman-auto-update =
+    let
+      updateScript = pkgs.writeShellApplication {
+        name = "podman-auto-update";
+        runtimeInputs = [
+          config.virtualisation.podman.package
+          pkgs.coreutils
+        ];
+        text = ''
+          runtime_dir="''${RUNTIME_DIRECTORY:-/run/podman-auto-update}"
+          outfile="$runtime_dir/dry-run.out"
+          errfile="$runtime_dir/dry-run.err"
+          pull_out="$runtime_dir/pull.out"
+          pull_err="$runtime_dir/pull.err"
+          restart_file="$runtime_dir/restart-units"
+
+          run_logged() {
+            local out="$1" err="$2" rc=0
+            shift 2
+            "$@" </dev/null >"$out" 2>"$err" || rc=$?
+            [ ! -s "$err" ] || cat "$err" >&2
+            if [ "$rc" -ne 0 ]; then
+              [ ! -s "$out" ] || cat "$out" >&2
+              exit "$rc"
+            fi
+            [ ! -s "$out" ] || cat "$out"
+          }
+
+          rm -f "$outfile" "$errfile" "$pull_out" "$pull_err" "$restart_file"
+
+          # Check registry digests without invoking rootless RestartUnit:
+          # NixOS oci-containers define system units, which do not exist on systemd --user.
+          run_logged "$outfile" "$errfile" podman auto-update --dry-run --format '{{.Unit}}|{{.Image}}|{{.Updated}}'
+
+          while IFS='|' read -r unit image updated; do
+            [ -n "$image" ] || continue
+            if [ "$updated" = "failed" ]; then
+              echo "podman auto-update reported failed status for $unit ($image)" >&2
+              exit 1
+            fi
+            [ "$updated" = "pending" ] || continue
+
+            echo "Pulling updated image $image for $unit..."
+            run_logged "$pull_out" "$pull_err" podman pull "$image"
+
+            if [[ "$unit" =~ ^podman-[a-zA-Z0-9_.@-]+\.service$ ]]; then
+              printf '%s\n' "$unit" >> "$restart_file"
+            else
+              echo "Refusing unexpected unit name '$unit'" >&2
+              exit 1
+            fi
+          done < "$outfile"
+        '';
+      };
+      restartScript = pkgs.writeShellApplication {
+        name = "podman-auto-update-restart";
+        runtimeInputs = [ pkgs.systemd ];
+        text = ''
+          runtime_dir="''${RUNTIME_DIRECTORY:-/run/podman-auto-update}"
+          restart_file="$runtime_dir/restart-units"
+          [ -s "$restart_file" ] || exit 0
+          while IFS= read -r unit; do
+            [ -n "$unit" ] || continue
+            echo "Restarting updated service $unit..."
+            systemctl restart "$unit" </dev/null
+          done < "$restart_file"
+        '';
+      };
+    in
+    {
+      description = "Podman auto-update";
+      after = [
+        "network-online.target"
+        "user@${toString config.users.users.podman.uid}.service"
+      ];
+      wants = [
+        "network-online.target"
+        "user@${toString config.users.users.podman.uid}.service"
+      ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = [
+          ""
+          "${updateScript}/bin/podman-auto-update"
+        ];
+        ExecStartPost = [
+          ""
+          "+${restartScript}/bin/podman-auto-update-restart"
+        ];
+        User = "podman";
+        Group = "podman";
+        RuntimeDirectory = "podman-auto-update";
+        # Omit NoNewPrivileges/RestrictNamespaces/RestrictSUIDSGID for rootless newuidmap,
+        # omit ProtectHome because systemd's ProtectHome blocks /run/user/<uid>,
+        # and omit PrivateDevices so fuse-overlayfs retains /dev/fuse access.
+        ProtectKernelTunables = true;
+        ProtectKernelModules = true;
+        ProtectControlGroups = true;
+        LockPersonality = true;
+      };
+      environment = {
+        HOME = config.users.users.podman.home;
+        XDG_RUNTIME_DIR = "/run/user/${toString config.users.users.podman.uid}";
+      };
     };
-    environment = {
-      HOME = config.users.users.podman.home;
-      XDG_RUNTIME_DIR = "/run/user/${toString config.users.users.podman.uid}";
-    };
-  };
 
   systemd.timers.podman-auto-update = {
     description = "Podman auto-update timer";

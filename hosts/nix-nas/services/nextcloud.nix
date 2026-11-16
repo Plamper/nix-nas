@@ -2,33 +2,70 @@
   config,
   pkgs,
   lib,
-  agenix,
   ...
 }:
 {
 
+  users.groups.nextcloud-secrets.gid = 4500;
+
+  age.secrets = {
+    "nextcloud" = {
+      file = ../../../secrets/nextcloud.age;
+      path = "/run/agenix-containers/nextcloud/nextcloud";
+      symlink = false;
+      owner = "root";
+      group = "nextcloud-secrets";
+      mode = "0440";
+    };
+    "nc-pg-pass" = {
+      file = ../../../secrets/nc-pg-pass.age;
+      path = "/run/agenix-containers/nextcloud/nc-pg-pass";
+      symlink = false;
+      owner = "root";
+      group = "nextcloud-secrets";
+      mode = "0440";
+    };
+  };
+
   systemd.tmpfiles.rules = [
     "d /mnt/data-pool/Backups/nextcloud 0700 postgres postgres -"
+    "d /run/agenix-containers/nextcloud 0750 root nextcloud-secrets -"
   ];
+
+  # Grant GPU render/card ACL strictly to container's mapped container-dri GID (196608 + 4501)
+  services.udev.extraRules = ''
+    SUBSYSTEM=="drm", KERNEL=="renderD*", RUN+="${pkgs.acl}/bin/setfacl -m g:201109:rw /dev/dri/%k"
+    SUBSYSTEM=="drm", KERNEL=="card*", RUN+="${pkgs.acl}/bin/setfacl -m g:201109:rw /dev/dri/%k"
+  '';
+
+  systemd.services."container@nextcloud" = {
+    unitConfig.RequiresMountsFor = [
+      "/mnt/data-pool/nextcloud"
+      "/mnt/data-pool/Backups/nextcloud"
+      "/run/agenix-containers/nextcloud"
+    ];
+    serviceConfig = {
+      ProtectHome = true;
+    };
+  };
 
   containers.nextcloud = {
     autoStart = true;
     privateNetwork = true;
+    privateUsers = 196608;
     hostAddress = "192.168.100.10";
     localAddress = "192.168.100.11";
 
-    bindMounts = {
-      "/Nextcloud" = {
-        hostPath = "/mnt/data-pool/nextcloud";
-        isReadOnly = false;
-      };
-      "/mnt/data-pool/Backups/nextcloud" = {
-        hostPath = "/mnt/data-pool/Backups/nextcloud";
-        isReadOnly = false;
-      };
-    };
-    bindMounts."/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
+    # devtmpfs does not support :idmap; ZFS and secret mounts use :idmap in extraFlags
     bindMounts."/dev/dri".isReadOnly = false;
+
+    extraFlags = [
+      "--private-users-ownership=auto"
+      "--system-call-filter=~@debug"
+      "--bind=/mnt/data-pool/nextcloud:/Nextcloud:idmap"
+      "--bind=/mnt/data-pool/Backups/nextcloud:/mnt/data-pool/Backups/nextcloud:idmap"
+      "--bind-ro=/run/agenix-containers/nextcloud:/run/secrets:idmap"
+    ];
 
     allowedDevices = [
       {
@@ -51,30 +88,9 @@
       {
 
         imports = [
-          agenix.nixosModules.default
           # Module which allows turning on private ip
           ./onlyoffice.nix
         ];
-
-        age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-        age.secrets = {
-          "nextcloud" = {
-            # Find better solution
-            file = ../../../secrets/nextcloud.age;
-            owner = "nextcloud";
-            group = "nextcloud";
-          };
-          "nc-pg-pass" = {
-            file = ../../../secrets/nc-pg-pass.age;
-            owner = "nextcloud";
-            group = "nextcloud";
-          };
-          onlyoffice-jwt = {
-            file = ../../../secrets/onlyoffice-jwt.age;
-            owner = "onlyoffice";
-            group = "onlyoffice";
-          };
-        };
 
         services.nginx.virtualHosts = {
           "cloud.plamper.org" = {
@@ -94,14 +110,14 @@
           phpOptions."opcache.interned_strings_buffer" = "32";
           config = {
             adminuser = "admin";
-            adminpassFile = config.age.secrets."nextcloud".path;
+            adminpassFile = "/run/secrets/nextcloud";
 
             # Nextcloud PostegreSQL database configuration, recommended over using SQLite
             dbtype = "pgsql";
             dbuser = "nextcloud";
             dbhost = "/run/postgresql"; # nextcloud will add /.s.PGSQL.5432 by itself
             dbname = "nextcloud";
-            dbpassFile = config.age.secrets."nc-pg-pass".path;
+            dbpassFile = "/run/secrets/nc-pg-pass";
           };
           home = "/Nextcloud";
           # Recognize has to be installed from AppStore as models are unable to be downloaded
@@ -174,6 +190,26 @@
             pkgs.exiftool
             pkgs.perl
           ];
+          serviceConfig = {
+            NoNewPrivileges = true;
+            ProtectSystem = "full";
+            ProtectHome = true;
+            PrivateTmp = true;
+            PrivateDevices = true;
+            CapabilityBoundingSet = "";
+            ProtectKernelTunables = true;
+            ProtectKernelModules = true;
+            ProtectControlGroups = true;
+            RestrictNamespaces = true;
+            RestrictRealtime = true;
+            RestrictSUIDSGID = true;
+            LockPersonality = true;
+            SystemCallArchitectures = "native";
+            SystemCallFilter = [
+              "@system-service"
+              "~@privileged"
+            ];
+          };
         };
 
         systemd.services.phpfpm-nextcloud.path = [
@@ -194,11 +230,15 @@
             "felix"
             "render"
             "video"
+            "nextcloud-secrets"
+            "container-dri"
           ];
         };
         users.groups = {
           pictures.gid = 3000;
           felix.gid = 4000;
+          nextcloud-secrets.gid = 4500;
+          container-dri.gid = 4501;
         };
 
         # Patch ffmpeg and intel vaapi driver for qsv
@@ -248,7 +288,23 @@
           SupplementaryGroups = [
             "render"
             "video"
+            "container-dri"
           ];
+          NoNewPrivileges = true;
+          # Master process starts as root to chown the socket and drop worker privileges
+          CapabilityBoundingSet = [
+            "CAP_CHOWN"
+            "CAP_SETUID"
+            "CAP_SETGID"
+            "CAP_DAC_OVERRIDE"
+          ];
+          ProtectKernelTunables = true;
+          ProtectKernelModules = true;
+          ProtectControlGroups = true;
+          RestrictNamespaces = true;
+          RestrictRealtime = true;
+          RestrictSUIDSGID = true;
+          LockPersonality = true;
         };
 
         # Setup Postgres
@@ -290,16 +346,20 @@
 
         services.prometheus.exporters.nextcloud = {
           enable = true;
-          # Set user and group to nextcloud so agenix file is readable
+          # Set user and group to nextcloud so mounted secret is readable
           user = "nextcloud";
           group = "nextcloud";
 
           url = "http://${config.services.nextcloud.hostName}";
           username = "admin";
-          passwordFile = config.age.secrets."nextcloud".path;
+          passwordFile = "/run/secrets/nextcloud";
           port = 9003;
           openFirewall = true;
         };
+
+        systemd.services.prometheus-nextcloud-exporter.serviceConfig.SupplementaryGroups = [
+          "nextcloud-secrets"
+        ];
 
         system.stateVersion = "24.05";
 

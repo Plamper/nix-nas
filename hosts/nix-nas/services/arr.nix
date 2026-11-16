@@ -1,11 +1,42 @@
 {
   config,
-  agenix,
   pkgs,
   lib,
   ...
 }:
 {
+
+  age.secrets = {
+    "pia" = {
+      path = "/run/agenix-containers/arr/pia";
+      symlink = false;
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
+    "pia-env" = {
+      file = ../../../secrets/pia-env.age;
+      path = "/run/agenix-containers/arr/pia-env";
+      symlink = false;
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
+  };
+
+  systemd.tmpfiles.rules = [
+    "d /run/agenix-containers/arr 0700 root root -"
+  ];
+
+  systemd.services."container@arr" = {
+    unitConfig.RequiresMountsFor = [
+      "/mnt/data-pool/media"
+      "/run/agenix-containers/arr"
+    ];
+    serviceConfig = {
+      ProtectHome = true;
+    };
+  };
 
   services.nginx.virtualHosts."transmission.plamper.org" = {
     enableACME = true;
@@ -94,17 +125,18 @@
     {
       autoStart = true;
       privateNetwork = true;
+      privateUsers = 131072;
       enableTun = true;
       hostAddress = hostAddress;
       localAddress = localAddress;
 
-      bindMounts = {
-        "/media" = {
-          hostPath = "/mnt/data-pool/media/";
-          isReadOnly = false;
-        };
-      };
-      bindMounts."/etc/ssh/ssh_host_ed25519_key".isReadOnly = true;
+      # ZFS and secret mounts use :idmap in extraFlags
+      extraFlags = [
+        "--private-users-ownership=auto"
+        "--system-call-filter=~@debug"
+        "--bind=/mnt/data-pool/media:/media:idmap"
+        "--bind-ro=/run/agenix-containers/arr:/run/secrets:idmap"
+      ];
 
       config =
         {
@@ -114,15 +146,9 @@
           ...
         }:
         {
-          imports = [
-            agenix.nixosModules.default
+          systemd.tmpfiles.rules = [
+            "d /run/pia 0700 root root -"
           ];
-
-          age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-          age.secrets = {
-            "pia".file = ../../../secrets/pia.age;
-            "pia-env".file = ../../../secrets/pia-env.age;
-          };
 
           services.openvpn.servers = {
             pia = {
@@ -150,34 +176,48 @@
 
                 disable-occ
               '';
-              authUserPass = config.age.secrets."pia".path;
+              authUserPass = "/run/secrets/pia";
               autoStart = true;
               updateResolvConf = true;
               up =
                 # bash
                 ''
                   echo "Up script ran!"
-                  echo "PF_GATEWAY=$route_vpn_gateway" > /tmp/pia-status.env
-                  echo "PF_HOSTNAME=$common_name" >> /tmp/pia-status.env
+                  mkdir -p /run/pia
+                  chmod 0700 /run/pia
+                  echo "PF_GATEWAY=$route_vpn_gateway" > /run/pia/pia-status.env
+                  echo "PF_HOSTNAME=$common_name" >> /run/pia/pia-status.env
                 '';
             };
           };
 
+          systemd.services.openvpn-pia.serviceConfig = {
+            ProtectHome = true;
+            ProtectKernelModules = true;
+            ProtectControlGroups = true;
+            PrivateTmp = true;
+            LockPersonality = true;
+          };
+
           networking.firewall = {
             enable = true;
-            allowedTCPPorts = [
-              22
-            ];
 
             # Enable strict reverse path filtering to prevent IP spoofing/leaks
             checkReversePath = "strict";
-            trustedInterfaces = [ "${vpnInterface}" ];
+            interfaces.${containerInterface}.allowedTCPPorts = [
+              8989
+              9091
+            ];
 
             extraCommands = ''
+              # Dynamic inbound chain for active PIA forwarded torrent port only
+              iptables -N pia-torrent-in 2>/dev/null || true
+              iptables -A nixos-fw -i ${vpnInterface} -j pia-torrent-in
+
               # Allow Loopback (Required for internal processes)
               iptables -A OUTPUT -o lo -j ACCEPT
 
-              # Allow LAN Access (SSH, WebUI, Local Discovery)
+              # Allow LAN Access (WebUI, Local Discovery)
               iptables -A OUTPUT -d ${hostAddress} -j ACCEPT
 
               # Allow connection TO the VPN server (Bootstrapping the tunnel)
@@ -198,6 +238,8 @@
             extraStopCommands = ''
               iptables -D OUTPUT -j DROP 2> /dev/null || true
               iptables -F OUTPUT
+              iptables -F pia-torrent-in 2> /dev/null || true
+              iptables -X pia-torrent-in 2> /dev/null || true
             '';
           };
 
@@ -220,27 +262,39 @@
             serviceConfig = {
               # PIA_USER
               # PIA_PASS
-              EnvironmentFile = config.age.secrets."pia-env".path;
+              EnvironmentFile = "/run/secrets/pia-env";
               Restart = "on-failure";
               RestartSec = "30s";
+              NoNewPrivileges = true;
+              ProtectSystem = "strict";
+              ReadWritePaths = [ "/run/pia" ];
+              ProtectHome = true;
+              PrivateTmp = true;
+              PrivateDevices = true;
+              ProtectKernelTunables = true;
+              ProtectKernelModules = true;
+              ProtectControlGroups = true;
+              CapabilityBoundingSet = "";
+              RestrictNamespaces = true;
+              RestrictRealtime = true;
+              RestrictSUIDSGID = true;
+              LockPersonality = true;
             };
 
             path = with pkgs; [
               curl
               jq
-              iproute2
               coreutils
               gnugrep
-              iptables
             ];
 
             script =
               # bash
               ''
-                STATUS_FILE="/tmp/pia-status.env"
-                TOKEN_FILE="/tmp/pia-token.txt"
-                PORT_FILE="/tmp/pia-port.txt"
-                CA_PATH="/tmp/pia-ca.crt"
+                STATUS_FILE="/run/pia/pia-status.env"
+                TOKEN_FILE="/run/pia/pia-token.txt"
+                PORT_FILE="/run/pia/pia-port.txt"
+                CA_PATH="/run/pia/pia-ca.crt"
 
                 if [ ! -f "$STATUS_FILE" ]; then
                   echo "VPN Status file not found. Is VPN up?"
@@ -316,31 +370,67 @@
           systemd.services.transmission-port-update = {
             description = "Update Transmission peer port from PIA forwarded port";
             after = [
+              "firewall.service"
               "pia-port-forward.service"
               "transmission.service"
             ];
-            requires = [ "pia-port-forward.service" ];
+            requires = [
+              "firewall.service"
+              "pia-port-forward.service"
+            ];
 
             serviceConfig = {
               Type = "oneshot";
+              NoNewPrivileges = true;
+              ProtectSystem = "full";
+              ReadOnlyPaths = [ "/run/pia" ];
+              ProtectHome = true;
+              PrivateTmp = true;
+              PrivateDevices = true;
+              ProtectKernelTunables = true;
+              ProtectKernelModules = true;
+              ProtectControlGroups = true;
+              CapabilityBoundingSet = [ "CAP_NET_ADMIN" ];
+              RestrictNamespaces = true;
+              RestrictRealtime = true;
+              RestrictSUIDSGID = true;
+              LockPersonality = true;
               ExecStart = pkgs.writeShellScript "transmission-port-update" ''
-                PORT=$(cat /tmp/pia-port.txt)
+                if [ ! -f /run/pia/pia-port.txt ]; then
+                  echo "PIA port file not found yet."
+                  exit 0
+                fi
+
+                PORT=$(cat /run/pia/pia-port.txt)
+                if ! [[ "$PORT" =~ ^[0-9]+$ ]] || [ "$PORT" -lt 1024 ] || [ "$PORT" -gt 65535 ]; then
+                  echo "Invalid PIA forwarded port: $PORT"
+                  exit 1
+                fi
+
+                # Permit only the active PIA forwarded torrent port on tun0
+                iptables -w -N pia-torrent-in 2>/dev/null || true
+                iptables -w -F pia-torrent-in
+                iptables -w -A pia-torrent-in -i ${vpnInterface} -p tcp --dport "$PORT" -j nixos-fw-accept
+                iptables -w -A pia-torrent-in -i ${vpnInterface} -p udp --dport "$PORT" -j nixos-fw-accept
+
                 SESSION_ID=$(wget --server-response --output-document=/dev/null \
-                  http://127.0.0.1:9091/rpc 2>&1 \
+                  http://${localAddress}:9091/rpc 2>&1 \
                   | grep "^\s*X-Transmission-Session-Id:" \
-                  | awk '{print $2}')
+                  | awk '{print $2}' | tr -d '\r' || true)
                 echo "Setting Transmission peer port to $PORT"
                 wget --post-data='{"method":"session-set","arguments":{"peer-port":'"$PORT"'}}' \
                   --header='Content-Type: application/json' \
                   --header="X-Transmission-Session-Id: $SESSION_ID" \
-                  http://127.0.0.1:9091/rpc -O -
+                  http://${localAddress}:9091/rpc -O -
               '';
             };
 
             path = with pkgs; [
+              coreutils
               wget
               gawk
               gnugrep
+              iptables
             ];
           };
 
@@ -358,7 +448,7 @@
             enable = true;
             package = pkgs.transmission_4;
             group = "media";
-            openRPCPort = true;
+            openRPCPort = false;
             settings = {
               pex-enabled = false;
               dht-enabled = false;
@@ -366,9 +456,11 @@
               download-dir = "/media/torrent";
               incomplete-dir = "${config.services.transmission.settings.download-dir}/.incomplete";
               #Override default settings
-              rpc-bind-address = "0.0.0.0"; # Bind to own IP
-              rpc-whitelist = "127.0.0.1,192.168.100.*,transmission.bodenlos-schlem.men,auth.bodenlos-schlem.men";
-              rpc_host_whitelist_enabled = false;
+              rpc-bind-address = localAddress; # Bind only to container subnet veth IP
+              rpc-whitelist = "192.168.100.14,192.168.100.15";
+              rpc-whitelist-enabled = true;
+              rpc-host-whitelist = "transmission.plamper.org,${localAddress}";
+              rpc-host-whitelist-enabled = true;
               rpc-url = "/";
               speed-limit-down = 7000;
               speed-limit-down-enabled = true;
@@ -399,18 +491,23 @@
             RootDirectory = lib.mkForce "";
           };
 
-          # Sonarr is dotnet 6 app which is marked is insecure
-          nixpkgs.config.permittedInsecurePackages = [
-            "aspnetcore-runtime-wrapped-6.0.36"
-            "aspnetcore-runtime-6.0.36"
-            "dotnet-sdk-wrapped-6.0.428"
-            "dotnet-sdk-6.0.428"
-          ];
-
           services.sonarr = {
             enable = true;
-            openFirewall = true;
+            openFirewall = false;
             group = "media";
+          };
+
+          systemd.services.sonarr.serviceConfig = {
+            # Nested PrivateUsers + ProtectProc="invisible" fails 217/USER under nspawn privateUsers
+            PrivateUsers = lib.mkForce false;
+            ProtectSystem = "strict";
+            ReadWritePaths = [
+              "/var/lib/sonarr"
+              "/media"
+            ];
+            ProtectKernelTunables = true;
+            ProtectKernelModules = true;
+            ProtectControlGroups = true;
           };
 
           # # needs to be configured when finally deployed

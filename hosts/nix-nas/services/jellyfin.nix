@@ -7,10 +7,27 @@
     "i915.enable_fbc=1"
   ];
 
+  # Grant GPU render/card ACL strictly to Jellyfin container's mapped media GID (262144 + 555)
+  services.udev.extraRules = ''
+    SUBSYSTEM=="drm", KERNEL=="renderD*", RUN+="${pkgs.acl}/bin/setfacl -m g:262699:rw /dev/dri/%k"
+    SUBSYSTEM=="drm", KERNEL=="card*", RUN+="${pkgs.acl}/bin/setfacl -m g:262699:rw /dev/dri/%k"
+  '';
+
+  systemd.services."container@jellyfin" = {
+    unitConfig.RequiresMountsFor = [
+      "/mnt/data-pool/media/Music"
+      "/mnt/data-pool/media/Video"
+    ];
+    serviceConfig = {
+      ProtectHome = true;
+    };
+  };
+
   containers.jellyfin = {
     nixpkgs = inputs.nixpkgs-unstable;
     autoStart = true;
     privateNetwork = true;
+    privateUsers = 262144;
     # forwardPorts = [{
     #   hostPort = 8096;
     # }];
@@ -19,19 +36,15 @@
     # hostAddress6 = "fc00::1";
     # localAddress6 = "fc00::2";
 
-    bindMounts = {
-      "/Music" = {
-        hostPath = "/mnt/data-pool/media/Music";
-        isReadOnly = false;
-      };
-    };
-    bindMounts = {
-      "/Video" = {
-        hostPath = "/mnt/data-pool/media/Video";
-        isReadOnly = false;
-      };
-    };
+    # devtmpfs does not support :idmap; ZFS media mounts use :idmap in extraFlags
     bindMounts."/dev/dri".isReadOnly = false;
+
+    extraFlags = [
+      "--private-users-ownership=auto"
+      "--system-call-filter=~@debug"
+      "--bind=/mnt/data-pool/media/Music:/Music:idmap"
+      "--bind=/mnt/data-pool/media/Video:/Video:idmap"
+    ];
 
     allowedDevices = [
       {
@@ -83,6 +96,8 @@
           openFirewall = true;
           group = "media";
         };
+        # Nested PrivateUsers + ProtectProc="invisible" fails 217/USER under nspawn privateUsers
+        systemd.services.jellyfin.serviceConfig.PrivateUsers = lib.mkForce false;
         environment.systemPackages = [
           pkgs.jellyfin
           pkgs.jellyfin-web

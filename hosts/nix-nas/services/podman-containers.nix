@@ -70,7 +70,7 @@
   virtualisation.oci-containers.containers.euro-office = {
     image = "ghcr.io/euro-office/documentserver:latest";
     podman.user = "podman";
-    ports = [ "7979:80" ];
+    ports = [ "127.0.0.1:7979:80" ];
     capabilities = {
       MKNOD = false;
       NET_RAW = false;
@@ -121,7 +121,7 @@
     capabilities.ALL = false;
 
     ports = [
-      "0.0.0.0:8978:8978"
+      "127.0.0.1:8978:8978"
     ];
 
     environment = {
@@ -149,6 +149,13 @@
       Type = "oneshot";
       ExecStart = "${pkgs.podman}/bin/podman auto-update";
       User = "podman";
+      # Omit NoNewPrivileges/RestrictNamespaces/RestrictSUIDSGID for rootless newuidmap
+      ProtectHome = true;
+      ProtectKernelTunables = true;
+      ProtectKernelModules = true;
+      ProtectControlGroups = true;
+      PrivateDevices = true;
+      LockPersonality = true;
     };
     environment = {
       HOME = config.users.users.podman.home;

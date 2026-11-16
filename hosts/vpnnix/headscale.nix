@@ -91,6 +91,16 @@ in
             value = "100.64.0.3";
           }
           {
+            name = "office.plamper.org";
+            type = "A";
+            value = "100.64.0.3";
+          }
+          {
+            name = "typst.plamper.org";
+            type = "A";
+            value = "100.64.0.3";
+          }
+          {
             name = "headplane.plamper.org";
             type = "A";
             value = "100.64.0.9";
@@ -173,6 +183,40 @@ in
         recommendedProxySettings = true;
       };
     };
+  };
+
+  systemd.services.headplane.serviceConfig = {
+    PrivateUsers = true;
+    ProtectProc = "invisible";
+    ProcSubset = "pid";
+    RemoveIPC = true;
+    ProtectKernelLogs = true;
+    NoNewPrivileges = true;
+    ProtectSystem = "strict";
+    ProtectHome = true;
+    PrivateTmp = true;
+    PrivateDevices = true;
+    ProtectKernelTunables = true;
+    ProtectKernelModules = true;
+    ProtectControlGroups = true;
+    RestrictNamespaces = true;
+    RestrictRealtime = true;
+    RestrictSUIDSGID = true;
+    # Node.js V8 JIT requires writable+executable memory
+    LockPersonality = true;
+    CapabilityBoundingSet = "";
+    ProtectClock = true;
+    ProtectHostname = true;
+    RestrictAddressFamilies = [
+      "AF_UNIX"
+      "AF_INET"
+      "AF_INET6"
+    ];
+    SystemCallArchitectures = "native";
+    SystemCallFilter = [
+      "@system-service"
+      "~@privileged"
+    ];
   };
 
   environment.systemPackages = [ config.services.headscale.package ];

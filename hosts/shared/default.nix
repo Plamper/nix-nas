@@ -46,6 +46,7 @@
     recommendedOptimisation = true;
     recommendedTlsSettings = true;
     statusPage = true;
+    serverTokens = false;
     enable = true;
   };
   # Open nginx firewall Ports
@@ -73,9 +74,52 @@
     ];
   };
 
+  services.tailscale.disableTaildrop = true;
+
+  security.protectKernelImage = true;
+  boot.kernel.sysctl = {
+    "kernel.unprivileged_bpf_disabled" = 1;
+    "kernel.kptr_restrict" = 2;
+    "kernel.dmesg_restrict" = 1;
+    "kernel.yama.ptrace_scope" = 1;
+    "net.ipv4.conf.all.accept_redirects" = 0;
+    "net.ipv4.conf.default.accept_redirects" = 0;
+    "net.ipv6.conf.all.accept_redirects" = 0;
+    "net.ipv6.conf.default.accept_redirects" = 0;
+    "net.ipv4.conf.all.send_redirects" = 0;
+    "net.ipv4.conf.default.send_redirects" = 0;
+    "net.ipv4.icmp_echo_ignore_broadcasts" = 1;
+    "net.ipv4.tcp_syncookies" = 1;
+  };
+
   # Collect systemd journal logs from every host and send them to the Loki instance
   # on nix-nas over the homelab VPN.
   services.alloy.enable = true;
+  systemd.services.alloy.serviceConfig = {
+    CapabilityBoundingSet = "";
+    PrivateDevices = true;
+    ProtectHome = true;
+    ProtectKernelTunables = true;
+    ProtectKernelModules = true;
+    ProtectControlGroups = true;
+    ProtectKernelLogs = true;
+    ProtectProc = "invisible";
+    ProcSubset = "pid";
+    RemoveIPC = true;
+    RestrictNamespaces = true;
+    RestrictRealtime = true;
+    RestrictSUIDSGID = true;
+    # Alloy embeds go-re2 (wazero WASM JIT) and probes bpf() at startup
+    LockPersonality = true;
+    ProtectClock = true;
+    ProtectHostname = true;
+    SystemCallArchitectures = "native";
+    SystemCallFilter = [
+      "@system-service"
+      "~@privileged"
+    ];
+    SystemCallErrorNumber = "EPERM";
+  };
   environment.etc."alloy/config.alloy".text = ''
     loki.write "default" {
       endpoint {

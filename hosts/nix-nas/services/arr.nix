@@ -4,6 +4,13 @@
   lib,
   ...
 }:
+let
+  securityHeaders = ''
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+  '';
+in
 {
 
   age.secrets = {
@@ -47,7 +54,8 @@
       proxyPass = "http://192.168.100.15:9091";
       extraConfig = ''
         proxy_pass_header X-Transmission-Session-Id;
-      '';
+      ''
+      + securityHeaders;
     };
   };
   services.oauth2-proxy.nginx.virtualHosts."transmission.plamper.org" = {
@@ -60,6 +68,7 @@
 
     locations."/" = {
       proxyPass = "http://192.168.100.15:8989/";
+      extraConfig = securityHeaders;
     };
   };
   services.oauth2-proxy.nginx.virtualHosts."sonarr.plamper.org" = {

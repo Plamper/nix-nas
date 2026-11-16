@@ -1,8 +1,13 @@
 { config, ... }:
 {
+  age.secrets."grafana-secret-key" = {
+    file = ../../../secrets/grafana-secret-key.age;
+    owner = "grafana";
+  };
+
   services.grafana = {
     enable = true;
-    settings.security.secret_key = "SW2YcwTIb9zpOOhoPsMm";
+    settings.security.secret_key = "$__file{${config.age.secrets."grafana-secret-key".path}}";
     settings.server = {
       domain = "grafana.plamper.org";
       http_port = 3000;

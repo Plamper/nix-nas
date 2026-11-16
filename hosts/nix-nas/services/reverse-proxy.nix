@@ -1,4 +1,11 @@
 { config, ... }:
+let
+  securityHeaders = ''
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+  '';
+in
 {
 
   # For each virtual host you would like to use DNS-01 validation with,
@@ -26,8 +33,24 @@
         enableACME = true;
         acmeRoot = null;
         locations."/" = {
-          proxyPass = "http://192.168.100.11";
+          proxyPass = "http://127.0.0.1:7979";
           proxyWebsockets = true;
+          extraConfig = ''
+            client_max_body_size 100m;
+            add_header Content-Security-Policy "frame-ancestors 'self' https://cloud.plamper.org;" always;
+            add_header X-Content-Type-Options "nosniff" always;
+            add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+          '';
+        };
+      };
+      "typst.plamper.org" = {
+        forceSSL = true;
+        enableACME = true;
+        acmeRoot = null;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:8978";
+          proxyWebsockets = true;
+          extraConfig = securityHeaders;
         };
       };
 
@@ -39,6 +62,7 @@
 
           proxyPass = "http://192.168.100.13:8096";
           proxyWebsockets = true; # needed if you need to use WebSocket
+          extraConfig = securityHeaders;
           # extraConfig =
           #   # required when the target is also TLS server with multiple hosts
           #   "proxy_ssl_server_name on;" +
@@ -52,6 +76,7 @@
 
           proxyPass = "http://192.168.100.13:8096";
           proxyWebsockets = true; # needed if you need to use WebSocket
+          extraConfig = securityHeaders;
           # extraConfig =
           #   # required when the target is also TLS server with multiple hosts
           #   "proxy_ssl_server_name on;" +
@@ -72,5 +97,39 @@
         default = "http_status:404";
       };
     };
+  };
+
+  systemd.services."cloudflared-tunnel-418e37a3-68a1-43e4-949b-a1f38ff4d9b7".serviceConfig = {
+    PrivateUsers = true;
+    ProtectProc = "invisible";
+    ProcSubset = "pid";
+    RemoveIPC = true;
+    ProtectKernelLogs = true;
+    NoNewPrivileges = true;
+    ProtectSystem = "strict";
+    ProtectHome = true;
+    PrivateTmp = true;
+    PrivateDevices = true;
+    ProtectKernelTunables = true;
+    ProtectKernelModules = true;
+    ProtectControlGroups = true;
+    RestrictNamespaces = true;
+    RestrictRealtime = true;
+    RestrictSUIDSGID = true;
+    MemoryDenyWriteExecute = true;
+    LockPersonality = true;
+    CapabilityBoundingSet = "";
+    ProtectClock = true;
+    ProtectHostname = true;
+    RestrictAddressFamilies = [
+      "AF_UNIX"
+      "AF_INET"
+      "AF_INET6"
+    ];
+    SystemCallArchitectures = "native";
+    SystemCallFilter = [
+      "@system-service"
+      "~@privileged"
+    ];
   };
 }

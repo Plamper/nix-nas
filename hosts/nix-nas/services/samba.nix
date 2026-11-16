@@ -9,12 +9,13 @@
         "netbios name" = "nix-nas";
         security = "user";
         #use sendfile = yes
-        "min protocol" = "smb2";
+        "server min protocol" = "SMB2_10";
+        "server signing" = "mandatory";
         # note: localhost is the ipv6 localhost ::1
-        "hosts allow" = "192.168.1. 127.0.0.1 100. localhost";
+        "hosts allow" = "192.168.178. 192.168.1. 127.0.0.1 100. localhost";
         "hosts deny" = "0.0.0.0/0";
         "guest account" = "nobody";
-        "map to guest" = "bad user";
+        "map to guest" = "Never";
       };
       Felix = {
         path = "/mnt/data-pool/Felix";

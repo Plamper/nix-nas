@@ -54,4 +54,5 @@ in
   "oauth2-proxy-oidc-secret.age".publicKeys = keys;
   "oauth2-proxy-cookie-secret.age".publicKeys = keys;
   "typst-editor-invite-token.age".publicKeys = keys;
+  "grafana-secret-key.age".publicKeys = keys;
 }

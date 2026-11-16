@@ -5,13 +5,14 @@
     group = "podman";
     home = "/var/lib/podman";
     createHome = true;
-    uid = 995;
+    # Distinct from 995 (already claimed by acme / systemd-oom on nix-nas)
+    uid = 960;
     autoSubUidGidRange = true;
     linger = true;
   };
 
   users.groups.podman = {
-    gid = 995;
+    gid = 960;
   };
 
   age.secrets.muse-env = {

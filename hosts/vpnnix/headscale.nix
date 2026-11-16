@@ -32,8 +32,13 @@ in
     settings = {
 
       node.expiry = "180d";
-      
+
       server_url = "https://${domain}";
+
+      policy = {
+        mode = "file";
+        path = ./policy.hujson;
+      };
 
       dns = {
         magic_dns = true;

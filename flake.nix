@@ -128,6 +128,21 @@
             agenix.nixosModules.default
           ];
         };
+
+        mailnix = nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit
+              inputs
+              outputs
+              agenix
+              ;
+          };
+          system = "x86_64-linux";
+          modules = [
+            ./hosts/mailnix
+            agenix.nixosModules.default
+          ];
+        };
       };
 
       packages.x86_64-linux.vpnnix-oci-image =
@@ -161,6 +176,16 @@
           profiles.system = {
             user = "root";
             path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.vpnnix;
+          };
+        };
+
+        mailnix = {
+          hostname = "138.2.190.8";
+          sshUser = "admin";
+          remoteBuild = false;
+          profiles.system = {
+            user = "root";
+            path = deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.mailnix;
           };
         };
       };

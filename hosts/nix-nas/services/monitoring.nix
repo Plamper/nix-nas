@@ -72,6 +72,15 @@
         ];
       }
       {
+        job_name = "node-mailnix";
+        static_configs = [
+          {
+            targets = [ "100.64.0.14:9100" ];
+            labels.host = "mailnix";
+          }
+        ];
+      }
+      {
         job_name = "node-vpnnix";
         static_configs = [
           {
@@ -92,6 +101,10 @@
             labels.host = "cloudnix";
           }
           {
+            targets = [ "100.64.0.14:9113" ];
+            labels.host = "mailnix";
+          }
+          {
             targets = [ "100.64.0.9:9113" ];
             labels.host = "vpnnix";
           }
@@ -101,8 +114,8 @@
         job_name = "postfix";
         static_configs = [
           {
-            targets = [ "100.64.0.4:9154" ];
-            labels.host = "cloudnix";
+            targets = [ "100.64.0.14:9154" ];
+            labels.host = "mailnix";
           }
         ];
       }

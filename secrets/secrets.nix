@@ -50,10 +50,12 @@ in
   "kanidm-oauth2-proxy-oidc-secret.age".publicKeys = keys;
   "kanidm-vaultwarden-oidc-secret.age".publicKeys = keys;
   "kanidm-forgejo-oidc-secret.age".publicKeys = keys;
+  "kanidm-typst-oidc-secret.age".publicKeys = keys;
   "vaultwarden-oidc-secret.age".publicKeys = keys;
   "vaultwarden-smtp-secret.age".publicKeys = keys;
   "oauth2-proxy-oidc-secret.age".publicKeys = keys;
   "oauth2-proxy-cookie-secret.age".publicKeys = keys;
   "typst-editor-invite-token.age".publicKeys = keys;
+  "typst-editor-oidc-secret.age".publicKeys = keys;
   "grafana-secret-key.age".publicKeys = keys;
 }

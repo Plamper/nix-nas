@@ -31,6 +31,12 @@
     group = "podman";
   };
 
+  age.secrets.typst-editor-oidc-secret = {
+    file = ../../../secrets/typst-editor-oidc-secret.age;
+    owner = "podman";
+    group = "podman";
+  };
+
   virtualisation.oci-containers.containers.muse = {
     image = "ghcr.io/museofficial/muse";
     podman.user = "podman";
@@ -129,9 +135,20 @@
       DATA_DIR = "/app/data";
       HOST = "0.0.0.0";
       PORT = "8978";
+      TRUST_PROXY = "true";
+      COOKIE_SECURE = "true";
+      OIDC_ISSUER_URL = "https://idm.plamper.org/oauth2/openid/typst";
+      OIDC_CLIENT_ID = "typst";
+      OIDC_REDIRECT_URI = "https://typst.plamper.org/api/oidc/callback";
+      OIDC_PROVIDER_NAME = "Kanidm";
+      OIDC_AUTO_REDIRECT = "true";
+      DISABLE_PASSWORD_LOGIN = "true";
     };
 
-    environmentFiles = [ config.age.secrets.typst-editor-invite-token.path ];
+    environmentFiles = [
+      config.age.secrets.typst-editor-invite-token.path
+      config.age.secrets.typst-editor-oidc-secret.path
+    ];
 
     volumes = [
       "/mnt/data-pool/typst:/app/data:U"

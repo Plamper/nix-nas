@@ -50,6 +50,11 @@
     group = "kanidm";
     mode = "440";
   };
+  age.secrets."kanidm-typst-oidc-secret" = {
+    file = ../../../secrets/kanidm-typst-oidc-secret.age;
+    group = "kanidm";
+    mode = "440";
+  };
   age.secrets."oauth2-proxy-oidc-secret" = {
     file = ../../../secrets/oauth2-proxy-oidc-secret.age;
     owner = "oauth2-proxy";
@@ -191,6 +196,20 @@
             "email"
             "groups"
             "ssh_publickeys"
+          ];
+        };
+      };
+      "typst" = {
+        displayName = "Typst";
+        originUrl = "https://typst.plamper.org/api/oidc/callback";
+        originLanding = "https://typst.plamper.org/";
+        basicSecretFile = config.age.secrets."kanidm-typst-oidc-secret".path;
+        preferShortUsername = true;
+        scopeMaps = {
+          "nextcloud_users" = [
+            "openid"
+            "profile"
+            "email"
           ];
         };
       };

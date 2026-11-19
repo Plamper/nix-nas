@@ -32,6 +32,20 @@
           maxretry = 5;
         };
       })
+      (lib.mkIf config.services.nginx.enable {
+        nginx-http-auth.settings = {
+          enabled = true; # covers HTTP authentication brute force
+          maxretry = 5;
+        };
+        nginx-botsearch.settings = {
+          enabled = true; # covers bots scanning for common vulnerabilities
+          maxretry = 5;
+        };
+        nginx-limit-req.settings = {
+          enabled = true; # covers rate-limited requests
+          maxretry = 5;
+        };
+      })
     ];
   };
 }

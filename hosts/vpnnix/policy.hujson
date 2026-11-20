@@ -3,9 +3,15 @@
     "group:admins": ["felix@"]
   },
 
+  "tagOwners": {
+    "tag:unprivileged": ["group:admins"]
+  },
+
   "hosts": {
     "nix-nas": "100.64.0.3",
-    "nix-nas-v6": "fd7a:115c:a1e0::3"
+    "nix-nas-v6": "fd7a:115c:a1e0::3",
+    "diener-f2": "100.64.0.6",
+    "diener-f2-v6": "fd7a:115c:a1e0::6"
   },
 
   "autoApprovers": {
@@ -23,21 +29,55 @@
       "ip": ["*"]
     },
 
-    // Family / external vpn_users: HTTP/HTTPS web services on nix-nas only
+    // Unprivileged (all non-admin users + tag:unprivileged devices):
+    // HTTPS only on nix-nas
     {
-      "src": ["autogroup:member"],
+      "src": ["autogroup:member", "tag:unprivileged"],
       "dst": ["nix-nas", "nix-nas-v6"],
-      "ip": ["tcp:80", "tcp:443"]
+      "ip": ["tcp:443"]
+    },
+
+    // Unprivileged: HTTPS and Samba (SMB) on diener-f2
+    {
+      "src": ["autogroup:member", "tag:unprivileged"],
+      "dst": ["diener-f2", "diener-f2-v6"],
+      "ip": ["tcp:443", "tcp:445"]
     }
   ],
 
   "tests": [
     {
-      "src": "fabian@",
-      "accept": ["100.64.0.3:443", "100.64.0.3:80"],
+      "src": "tag:unprivileged",
+      "accept": [
+        "100.64.0.3:443",
+        "100.64.0.6:443",
+        "100.64.0.6:445"
+      ],
       "deny": [
+        "100.64.0.3:80",
         "100.64.0.3:22",
         "100.64.0.3:445",
+        "100.64.0.6:80",
+        "100.64.0.6:22",
+        "100.64.0.4:22",
+        "100.64.0.9:443",
+        "192.168.178.1:80",
+        "1.1.1.1:443",
+        "100.64.0.2:22"
+      ]
+    },
+    {
+      "src": "fabian@",
+      "accept": [
+        "100.64.0.3:443",
+        "100.64.0.6:443",
+        "100.64.0.6:445"
+      ],
+      "deny": [
+        "100.64.0.3:80",
+        "100.64.0.3:22",
+        "100.64.0.3:445",
+        "100.64.0.6:80",
         "100.64.0.6:22",
         "100.64.0.4:22",
         "100.64.0.9:443",
@@ -50,9 +90,16 @@
     },
     {
       "src": "sebbo@",
-      "accept": ["100.64.0.3:443", "100.64.0.3:80"],
+      "accept": [
+        "100.64.0.3:443",
+        "100.64.0.6:443",
+        "100.64.0.6:445"
+      ],
       "deny": [
+        "100.64.0.3:80",
         "100.64.0.3:22",
+        "100.64.0.6:80",
+        "100.64.0.6:22",
         "100.64.0.4:22",
         "100.64.0.14:22",
         "100.64.0.9:443",

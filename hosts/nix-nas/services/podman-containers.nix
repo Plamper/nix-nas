@@ -20,6 +20,8 @@ let
     "${pkgs.libertinus}/share/fonts/opentype:/usr/share/fonts/opentype/libertinus/:ro"
     "${pkgs.stix-two}/share/fonts/opentype:/usr/share/fonts/opentype/stix-two/:ro"
     "${pkgs.eb-garamond}/share/fonts/opentype:/usr/share/fonts/opentype/eb-garamond/:ro"
+    "${pkgs.alegreya}/share/fonts/opentype:/usr/share/fonts/opentype/alegreya/:ro"
+    "${pkgs.alegreya-sans}/share/fonts/opentype:/usr/share/fonts/opentype/alegreya-sans/:ro"
     "${pkgs.ibm-plex}/share/fonts/opentype:/usr/share/fonts/opentype/ibm-plex/:ro"
     "${pkgs.source-sans}/share/fonts/opentype:/usr/share/fonts/opentype/source-sans/:ro"
     "${pkgs.source-serif}/share/fonts/opentype:/usr/share/fonts/opentype/source-serif/:ro"
@@ -123,6 +125,8 @@ in
     libertinus
     stix-two
     eb-garamond
+    alegreya
+    alegreya-sans
     ibm-plex
     source-sans
     source-serif

@@ -16,7 +16,18 @@ let
     "${pkgs.fira-math}/share/fonts/opentype:/usr/share/fonts/opentype/fira-math/:ro"
     "${pkgs.newcomputermodern}/share/fonts/opentype/public:/usr/share/fonts/opentype/newcomputermodern/:ro"
     "${pkgs.lmodern}/share/fonts/opentype/public:/usr/share/fonts/opentype/lmodern/:ro"
+    "${pkgs.gyre-fonts}/share/fonts/opentype:/usr/share/fonts/opentype/gyre-fonts/:ro"
     "${pkgs.libertinus}/share/fonts/opentype:/usr/share/fonts/opentype/libertinus/:ro"
+    "${pkgs.stix-two}/share/fonts/opentype:/usr/share/fonts/opentype/stix-two/:ro"
+    "${pkgs.eb-garamond}/share/fonts/opentype:/usr/share/fonts/opentype/eb-garamond/:ro"
+    "${pkgs.ibm-plex}/share/fonts/opentype:/usr/share/fonts/opentype/ibm-plex/:ro"
+    "${pkgs.source-sans}/share/fonts/opentype:/usr/share/fonts/opentype/source-sans/:ro"
+    "${pkgs.source-serif}/share/fonts/opentype:/usr/share/fonts/opentype/source-serif/:ro"
+    "${pkgs.source-code-pro}/share/fonts/opentype:/usr/share/fonts/opentype/source-code-pro/:ro"
+    "${pkgs.jetbrains-mono}/share/fonts/truetype:/usr/share/fonts/truetype/jetbrains-mono/:ro"
+    "${pkgs.fira-code}/share/fonts/truetype:/usr/share/fonts/truetype/fira-code/:ro"
+    "${pkgs.open-sans}/share/fonts/truetype:/usr/share/fonts/truetype/open-sans/:ro"
+    "${pkgs.lato}/share/fonts/lato:/usr/share/fonts/truetype/lato/:ro"
     "${pkgs.texlivePackages.tex-gyre-math.tex}/fonts/opentype/public/tex-gyre-math:/usr/share/fonts/opentype/tex-gyre-math/:ro"
     "${noto-cjk-sans}/OTF:/usr/share/fonts/opentype/noto-cjk-sans/:ro"
     "${noto-cjk-serif}/OTF:/usr/share/fonts/opentype/noto-cjk-serif/:ro"
@@ -108,7 +119,18 @@ in
     noto-fonts
     newcomputermodern
     lmodern
+    gyre-fonts
     libertinus
+    stix-two
+    eb-garamond
+    ibm-plex
+    source-sans
+    source-serif
+    source-code-pro
+    jetbrains-mono
+    fira-code
+    open-sans
+    lato
     liberation_ttf
     dejavu_fonts
   ];

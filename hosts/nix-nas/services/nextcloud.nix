@@ -310,6 +310,13 @@
         # Setup Postgres
         services.postgresql = {
           enable = true;
+          package = pkgs.postgresql_18;
+
+          # Fix collation mismatches
+          initdbArgs = [
+            "--locale-provider=builtin"
+            "--builtin-locale=C.UTF-8"
+          ];
 
           # Ensure the database, user, and permissions always exist
           ensureDatabases = [ "nextcloud" ];

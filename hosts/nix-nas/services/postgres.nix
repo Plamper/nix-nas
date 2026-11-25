@@ -3,6 +3,13 @@
   # Setup Postgres
   services.postgresql = {
     enable = true;
+    package = pkgs.postgresql_18;
+
+    # Fix collation mismatches
+    initdbArgs = [
+      "--locale-provider=builtin"
+      "--builtin-locale=C.UTF-8"
+    ];
     # Copied from wiki to fix postgres login, extended so the postgres
     # superuser can connect to any database (not just one matching its name)
     authentication = pkgs.lib.mkOverride 10 ''

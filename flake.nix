@@ -75,6 +75,8 @@
             wireguard-tools
             deploy-rs.packages.${system}.default
             qrencode
+            rclone
+            restic
           ];
         }
       );

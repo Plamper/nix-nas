@@ -50,15 +50,4 @@
       SMTP_FROM_NAME = "Plamper.org Vaultwarden";
     };
   };
-
-  services.postgresqlBackup = {
-    enable = true;
-    databases = [ "vaultwarden" ];
-    location = "/mnt/data-pool/Backups/vaultwarden";
-    startAt = "*-*-* 01:15:00";
-  };
-
-  systemd.tmpfiles.rules = [
-    "d /mnt/data-pool/Backups/vaultwarden 0700 postgres postgres -"
-  ];
 }

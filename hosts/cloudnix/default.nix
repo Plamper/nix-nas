@@ -14,8 +14,6 @@
     ./hardware-configuration.nix
     # "${builtins.fetchTarball "https://github.com/nix-community/disko/archive/v1.11.0.tar.gz"}/module.nix"
     ./disk-config.nix
-
-    ./mailserver.nix
     # ./immich-reverse-proxy.nix
   ];
 

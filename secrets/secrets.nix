@@ -58,4 +58,6 @@ in
   "typst-editor-invite-token.age".publicKeys = keys;
   "typst-editor-oidc-secret.age".publicKeys = keys;
   "grafana-secret-key.age".publicKeys = keys;
+  "restic-password.age".publicKeys = [ pc-key nas-admin-key nas-host-key bitwarden-key ];
+  "restic-rclone-env.age".publicKeys = [ pc-key nas-admin-key nas-host-key bitwarden-key ];
 }

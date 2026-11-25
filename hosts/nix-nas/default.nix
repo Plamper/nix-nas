@@ -36,6 +36,7 @@
     ./services/forgejo.nix
     ./services/kanidm.nix
     ./services/vaultwarden.nix
+    ./services/backups.nix
   ];
   nixpkgs = {
     # You can add overlays here

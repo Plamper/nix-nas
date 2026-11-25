@@ -17,4 +17,17 @@
          superuser_map      /^(.*)$   \1
     '';
   };
+
+  users.users.postgres.extraGroups = [ "backup" ];
+
+  services.postgresqlBackup = {
+    enable = true;
+    databases = [
+      "vaultwarden"
+      "forgejo"
+    ];
+    location = "/mnt/data-pool/Backups/postgres";
+    compression = "zstd";
+    startAt = "*-*-* 02:00:00";
+  };
 }

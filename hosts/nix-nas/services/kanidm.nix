@@ -75,7 +75,9 @@
       tls_chain = "/var/lib/acme/idm.plamper.org/fullchain.pem";
       tls_key = "/var/lib/acme/idm.plamper.org/key.pem";
       online_backup = {
-        path = "/mnt/data-pool/Backup/kanidm";
+        path = "/mnt/data-pool/Backups/kanidm";
+        schedule = "00 02 * * *";
+        versions = 7;
       };
     };
   };
@@ -84,12 +86,13 @@
     settings.uri = "https://idm.plamper.org";
   };
 
-  # access to acme certificates
-  users.users.kanidm.extraGroups = [ "nginx" ];
-
-  systemd.tmpfiles.rules = [
-    "d /mnt/data-pool/Backup/kanidm 0750 kanidm kanidm -"
+  # access to acme certificates and /mnt/data-pool/Backups traversal
+  users.users.kanidm.extraGroups = [
+    "nginx"
+    "backup"
   ];
+
+  systemd.services.kanidm.unitConfig.RequiresMountsFor = [ "/mnt/data-pool" ];
 
   services.kanidm.provision = {
     enable = true;

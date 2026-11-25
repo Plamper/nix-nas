@@ -1,4 +1,37 @@
 { config, pkgs, ... }:
+let
+  noto-cjk-serif = pkgs.fetchzip {
+    url = "https://github.com/notofonts/noto-cjk/releases/download/Serif2.003/05_NotoSerifCJKOTF.zip";
+    hash = "sha256-yZfDZ3tHIgp/GPLbYJ5GQqS7pThC1kW8lxSv23AFVpQ=";
+    stripRoot = false;
+  };
+  noto-cjk-sans = pkgs.fetchzip {
+    url = "https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/04_NotoSansCJK-OTF.zip";
+    hash = "sha256-lWhQ5/KNS01sr7m0hmt1kO4jnvLcxN++BP489XlfwAc=";
+    stripRoot = false;
+  };
+  fontVolumes = [
+    "${pkgs.geist-font}/share/fonts/opentype:/usr/share/fonts/opentype/geist/:ro"
+    "${pkgs.fira-sans}/share/fonts/opentype:/usr/share/fonts/opentype/fira-sans/:ro"
+    "${pkgs.fira-math}/share/fonts/opentype:/usr/share/fonts/opentype/fira-math/:ro"
+    "${pkgs.newcomputermodern}/share/fonts/opentype/public:/usr/share/fonts/opentype/newcomputermodern/:ro"
+    "${pkgs.lmodern}/share/fonts/opentype/public:/usr/share/fonts/opentype/lmodern/:ro"
+    "${pkgs.libertinus}/share/fonts/opentype:/usr/share/fonts/opentype/libertinus/:ro"
+    "${pkgs.texlivePackages.tex-gyre-math.tex}/fonts/opentype/public/tex-gyre-math:/usr/share/fonts/opentype/tex-gyre-math/:ro"
+    "${noto-cjk-sans}/OTF:/usr/share/fonts/opentype/noto-cjk-sans/:ro"
+    "${noto-cjk-serif}/OTF:/usr/share/fonts/opentype/noto-cjk-serif/:ro"
+    "${pkgs.inter}/share/fonts/truetype:/usr/share/fonts/truetype/inter/:ro"
+    "${pkgs.roboto}/share/fonts/truetype:/usr/share/fonts/truetype/roboto/:ro"
+    "${pkgs.roboto-serif}/share/fonts/truetype:/usr/share/fonts/truetype/roboto-serif/:ro"
+    "${pkgs.corefonts}/share/fonts/truetype:/usr/share/fonts/truetype/corefonts/:ro"
+    "${pkgs.vista-fonts}/share/fonts/truetype:/usr/share/fonts/truetype/vista-fonts/:ro"
+    "${pkgs.vista-fonts-chs}/share/fonts/truetype:/usr/share/fonts/truetype/vista-fonts-chs/:ro"
+    "${pkgs.vista-fonts-cht}/share/fonts/truetype:/usr/share/fonts/truetype/vista-fonts-cht/:ro"
+    "${pkgs.liberation_ttf}/share/fonts/truetype:/usr/share/fonts/truetype/liberation/:ro"
+    "${pkgs.dejavu_fonts}/share/fonts/truetype:/usr/share/fonts/truetype/dejavu/:ro"
+    "${pkgs.noto-fonts}/share/fonts/noto:/usr/share/fonts/noto/:ro"
+  ];
+in
 {
   users.users.podman = {
     isSystemUser = true;
@@ -63,6 +96,7 @@
   fonts.fontDir.enable = true;
   fonts.packages = with pkgs; [
     fira-sans
+    fira-math
     geist-font
     inter
     roboto
@@ -72,6 +106,11 @@
     vista-fonts-chs
     vista-fonts-cht
     noto-fonts
+    newcomputermodern
+    lmodern
+    libertinus
+    liberation_ttf
+    dejavu_fonts
   ];
 
   virtualisation.oci-containers.containers.euro-office = {
@@ -90,33 +129,7 @@
       config.age.secrets.onlyoffice-docker-jwt.path
     ];
     labels."io.containers.autoupdate" = "registry";
-    volumes =
-      let
-        noto-cjk-serif = pkgs.fetchzip {
-          url = "https://github.com/notofonts/noto-cjk/releases/download/Serif2.003/05_NotoSerifCJKOTF.zip";
-          hash = "sha256-yZfDZ3tHIgp/GPLbYJ5GQqS7pThC1kW8lxSv23AFVpQ=";
-          stripRoot = false;
-        };
-        noto-cjk-sans = pkgs.fetchzip {
-          url = "https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/04_NotoSansCJK-OTF.zip";
-          hash = "sha256-lWhQ5/KNS01sr7m0hmt1kO4jnvLcxN++BP489XlfwAc=";
-          stripRoot = false;
-        };
-      in
-      [
-        "${pkgs.geist-font}/share/fonts/opentype:/usr/share/fonts/opentype/geist/:ro"
-        "${pkgs.fira-sans}/share/fonts/opentype:/usr/share/fonts/opentype/fira-sans/:ro"
-        "${noto-cjk-sans}/OTF:/usr/share/fonts/opentype/noto-cjk-sans/:ro"
-        "${noto-cjk-serif}/OTF:/usr/share/fonts/opentype/noto-cjk-serif/:ro"
-        "${pkgs.inter}/share/fonts/truetype:/usr/share/fonts/truetype/inter/:ro"
-        "${pkgs.roboto}/share/fonts/truetype:/usr/share/fonts/truetype/roboto/:ro"
-        "${pkgs.roboto-serif}/share/fonts/truetype:/usr/share/fonts/truetype/roboto-serif/:ro"
-        "${pkgs.corefonts}/share/fonts/truetype:/usr/share/fonts/truetype/corefonts/:ro"
-        "${pkgs.vista-fonts}/share/fonts/truetype:/usr/share/fonts/truetype/vista-fonts/:ro"
-        "${pkgs.vista-fonts-chs}/share/fonts/truetype:/usr/share/fonts/truetype/vista-fonts-chs/:ro"
-        "${pkgs.vista-fonts-cht}/share/fonts/truetype:/usr/share/fonts/truetype/vista-fonts-cht/:ro"
-        "${pkgs.noto-fonts}/share/fonts/noto:/usr/share/fonts/noto/:ro"
-      ];
+    volumes = fontVolumes;
   };
 
   # Configure the OCI Container
@@ -152,7 +165,8 @@
 
     volumes = [
       "/mnt/data-pool/typst:/app/data:U"
-    ];
+    ]
+    ++ fontVolumes;
 
     extraOptions = [
       "--security-opt=no-new-privileges"
